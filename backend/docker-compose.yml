@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: utibunna-db
+    environment:
+      POSTGRES_USER: antonio
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: utibunna
+    ports:
+      - "5435:5432"
+
