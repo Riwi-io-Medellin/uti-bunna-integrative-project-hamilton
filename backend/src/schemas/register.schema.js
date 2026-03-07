@@ -1,8 +1,8 @@
 export const registerSchema = {
   type: "object",
-  required: ["name","email","password","role"],
+  required: ["fullName", "email", "password", "role", "shift", "phone", "address", "location"],
   properties: {
-    name: {
+    fullName: {
       type: "string",
       minLength: 2
     },
@@ -16,7 +16,35 @@ export const registerSchema = {
     },
     role: {
       type: "string",
-      enum: ["driver","passenger"]
+      enum: ["driver", "passenger"]
+    },
+    shift: {
+      type: "string",
+      enum: ["morning", "evening"]
+    },
+    phone: {
+      type: "string",
+      minLength: 1
+    },
+    address: {
+      type: "string",
+      minLength: 1
+    },
+    location: {
+      type: "object",
+      required: ["type", "coordinates"],
+      properties: {
+        type: {
+          type: "string",
+          enum: ["Point"]
+        },
+        coordinates: {
+          type: "array",
+          items: { type: "number" },
+          minItems: 2,
+          maxItems: 2
+        }
+      }
     }
   }
 }

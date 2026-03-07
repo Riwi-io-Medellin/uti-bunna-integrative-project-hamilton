@@ -3,7 +3,7 @@ import {hashPassword} from "../utils/hash.js"
 import {generateToken} from "../utils/jwt.js"
 
 export const register = async (userData) => {
-  const {name, email, password, role} = userData
+  const { fullName, email, password, role, shift, phone, address, location } = userData
 
   const existingUser = await userRepository.findUserByEmail(email)
 
@@ -13,12 +13,19 @@ export const register = async (userData) => {
 
   const hashedPassword = await hashPassword(password)
 
-  const user = await userRepository.createUser(
-     name,email,hashedPassword,role
-  )
+  const user = await userRepository.createUser({
+    fullName,
+    email,
+    passwordHash: hashedPassword,
+    role,
+    shift,
+    phone,
+    address,
+    location
+  })
 
   const token = generateToken({
-     id: user.rows[0].id,
+     id: user.rows[0].user_id,
      role: user.rows[0].role
   })
 
