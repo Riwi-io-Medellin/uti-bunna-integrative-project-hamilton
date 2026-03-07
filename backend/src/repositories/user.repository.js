@@ -21,3 +21,15 @@ export const createUser = async (userData) => {
 
   return pool.query(query, values)
 }
+
+export const updateDriverRoute = async (userId, route, route_bbox) => {
+  const query = `
+    UPDATE drivers
+    SET route = ST_GeomFromGeoJSON($2),
+        route_bbox = ST_GeomFromGeoJSON($3)
+    WHERE user_id = $1
+    RETURNING user_id, ST_AsGeoJSON(route) as route, ST_AsGeoJSON(route_bbox) as route_bbox, created_at
+  `
+
+  return pool.query(query, [userId, JSON.stringify(route), JSON.stringify(route_bbox)])
+}

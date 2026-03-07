@@ -4,7 +4,12 @@
 
 The register endpoint allows new users to create an account in the system. Users can register as either a `driver` or a `passenger`. 
 
-When a user registers with `role = "driver"`, the system automatically creates a driver profile with placeholder route data. The route can be updated later using the update driver endpoint.
+When a user registers with `role = "driver"`, the system automatically:
+1. Creates a driver profile via database trigger
+2. Calculates the route from the user's location to the RIWI destination using OSRM API
+3. Updates the driver record with the calculated route and bounding box
+
+The route is calculated automatically using the user's `location` coordinates and the RIWI destination coordinates from environment variables (`RIWI_LAT` and `RIWI_LON`).
 
 ## Endpoint
 
@@ -203,11 +208,32 @@ fetch('http://localhost:3000/api/auth/register', {
     },
     "created_at": "2024-01-15T10:30:00.000Z"
   },
+  "driver": {
+    "user_id": 2,
+    "route": {
+      "type": "LineString",
+      "coordinates": [
+        [-73.985, 40.748],
+        [-73.99, 40.75],
+        [-73.995, 40.752],
+        [-75.583, 6.219]
+      ]
+    },
+    "route_bbox": {
+      "type": "Polygon",
+      "coordinates": [[
+        [-74.0, 40.74],
+        [-73.98, 40.74],
+        [-73.98, 40.76],
+        [-74.0, 40.76],
+        [-74.0, 40.74]
+      ]]
+    },
+    "created_at": "2024-01-15T10:30:00.000Z"
+  },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
-
-> **Note:** When registering as a driver, the system automatically creates a driver profile with placeholder route data. Use the update driver endpoint to set the actual route later.
 
 ## Error Responses
 
