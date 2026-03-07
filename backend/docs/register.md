@@ -2,14 +2,20 @@
 
 ## Overview
 
-The register endpoint allows new users to create an account in the system. Users can register as either a `driver` or a `passenger`. 
+The register endpoint allows new users to create an account in the system. Users can register as either a `driver` or a `passenger`.
 
-When a user registers with `role = "driver"`, the system automatically:
-1. Creates a driver profile via database trigger
-2. Calculates the route from the user's location to the RIWI destination using OSRM API
-3. Updates the driver record with the calculated route and bounding box
+The request body is the same for both roles. The driver profile is created and updated automatically by the backend:
 
-The route is calculated automatically using the user's `location` coordinates and the RIWI destination coordinates from environment variables (`RIWI_LAT` and `RIWI_LON`).
+When a user registers with `role = "driver"`:
+1. A driver profile is automatically created via database trigger
+2. The system calculates the route from the user's location to the RIWI destination using OSRM API
+3. The driver record is updated with the calculated route and bounding box
+
+The route is calculated automatically using:
+- User's `location` coordinates from the request
+- RIWI destination coordinates from environment variables (`RIWI_LAT` and `RIWI_LON`)
+
+> **Note:** No additional parameters are needed for drivers. The driver profile is handled entirely by the backend.
 
 ## Endpoint
 
@@ -285,7 +291,7 @@ fetch('http://localhost:3000/api/auth/register', {
 | shift    | Must be "morning" or "evening"                         |
 | phone    | String, not empty                                      |
 | address  | String, not empty                                      |
-| location | GeoJSON Point with [longitude, latitude] coordinates  |
+| location | GeoJSON Point with [longitude, latitude] coordinates    |
 
 ## Coordinate Format
 
@@ -295,5 +301,3 @@ All geographic coordinates follow the GeoJSON standard:
 Example coordinates (New York City):
 - Longitude: -74.006 (range: -180 to 180)
 - Latitude: 40.7128 (range: -90 to 90)
-
-
