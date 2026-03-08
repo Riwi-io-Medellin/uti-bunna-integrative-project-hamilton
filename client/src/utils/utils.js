@@ -9,6 +9,10 @@ export function clearSession() {
 }
 
 
+
+//Map functions
+let map;
+let marker;
 function obtenerUbicacion() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
@@ -23,45 +27,52 @@ function obtenerUbicacion() {
   });
 }
 export function useMap() {
+  var lat = 6.219186319336883
+  var lng = -75.5836256336475
 
   /* Dibujar el mapa en medellín */
-  var map = L.map('map').setView([6.2442, -75.5812], 16);
+  map = L.map('map').setView([lat, lng], 16);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(map);
 
-  var marker;
-  obtenerUbicacion()
-    .then(pos => {
-      console.log("Lat:", pos.coords.latitude);
-      console.log("Lon:", pos.coords.longitude);
+  getAddress(lat, lng);
+  marker = L.marker([lat, lng], { draggable: true }).addTo(map);
 
-      let lat = pos.coords.latitude;
-      let lng = pos.coords.longitude;
-
-      // Centrar mapa en ubicación actual
-      map.setView([lat, lng], 16);
-
-      // Crear marcador inicial
-      marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-
-
-      getAddress(lat, lng);
-
-      if (marker) {
-        marker.setLatLng([lat, lng]);
-      }
-    })
-    .catch(err => {
-      console.error(err.message);
-    });
-
+  /*  obtenerUbicacion()
+     .then(pos => {
+       console.log("Lat:", pos.coords.latitude);
+       console.log("Lon:", pos.coords.longitude);
+ 
+       let lat = pos.coords.latitude;
+       let lng = pos.coords.longitude;
+ 
+       // Centrar mapa en ubicación actual
+       map.setView([lat, lng], 16);
+ 
+       // Crear marcador inicial
+       marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+ 
+ 
+       getAddress(lat, lng);
+ 
+       map.setView([lat, lng], 16);
+       if (marker) {
+         marker.setLatLng([lat, lng]);
+       } else {
+         marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+       }
+     })
+     .catch(err => {
+       console.error(err.message);
+     });
+  */
 
 
   map.on('click', function (e) {
-    var lat = e.latlng.lat;
-    var lng = e.latlng.lng;
+    lat = e.latlng.lat;
+    lng = e.latlng.lng;
 
     if (marker) {
       marker.setLatLng(e.latlng);
@@ -69,40 +80,44 @@ export function useMap() {
       marker = L.marker(e.latlng, { draggable: true }).addTo(map);
     }
 
-    console.log(lat, lng);
-    console.log(getAddress(lat, lng))
+    getAddress(lat, lng)
 
     marker.on('dragend', function (e) {
       var position = marker.getLatLng();
-      console.log(position);
-    });
-  });
 
-  // Exportar una función para actualizar el mapa desde afuera
-  return {
-    updateMapPosition: (lat, lng) => {
-      const position = [lat, lng];
-      map.setView(position, 16);
-      if (marker) {
-        marker.setLatLng(position);
-      } else {
-        marker = L.marker(position, { draggable: true }).addTo(map);
-      }
-    }
-  };
+    });
+    return { lat, lng }
+
+  });
+  return { lat, lng }
+}
+
+export function updateMapPosition(lat, lng) {
+  map.setView([lat, lng], 16);
+  if (marker) {
+    marker.setLatLng([lat, lng]);
+  } else {
+    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+  }
+}
+
+export function getMarkerPosition() {
+  if (marker) {
+    const position = marker.getLatLng();
+    return { lat: position.lat, lon: position.lng };
+  }
+  return null;
 }
 
 function getAddress(lat, lng) {
   fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
     .then(response => response.json())
     .then(data => {
-      console.log(data)
       document.getElementById('location').value = data.display_name;
     });
 }
 
 export async function getNaturalAddress(busqueda) {
-  console.log(busqueda);
 
   try {
     const query = encodeURIComponent(busqueda);

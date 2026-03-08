@@ -1,5 +1,5 @@
 import { initMap, Map } from "../components/Map.js"
-import { getNaturalAddress } from "../utils/utils.js"
+import { getNaturalAddress, getMarkerPosition } from "../utils/utils.js"
 
 export function RegisterForm() {
     return `
@@ -123,22 +123,33 @@ export function RegisterForm() {
 }
 
 export function initRegisterForm() {
-    // 1. Guardamos la instancia del mapa que nos permite actualizarlo
-    const mapInstance = initMap()
+    initMap()
     let selectedLocation = null;
     let timeoutId;
-    
+
     document.getElementById('registerForm')?.addEventListener('submit', (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        console.log(selectedLocation);
         
-        if (selectedLocation) {
-            formData.append('lat', selectedLocation.lat);
-            formData.append('lon', selectedLocation.lon);
-            formData.append('display_name', selectedLocation.display_name);
+        // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
+        const currentMarkerPosition = getMarkerPosition();
+
+        if (currentMarkerPosition) {
+             formData.append('lat', currentMarkerPosition.lat);
+             formData.append('lon', currentMarkerPosition.lon);
+        } else if (selectedLocation) {
+             // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
+             formData.append('lat', selectedLocation.lat);
+             formData.append('lon', selectedLocation.lon);
         }
-        
+
+        // Siempre mandamos el display_name del input original o de selectedLocation
+        if (selectedLocation) {
+             formData.append('display_name', selectedLocation.display_name);
+        } else {
+             formData.append('display_name', document.getElementById('location').value);
+        }
+
         const data = Object.fromEntries(formData.entries())
         console.log(data);
     })
@@ -178,19 +189,11 @@ export function initRegisterForm() {
                     list.appendChild(li);
 
                     li.addEventListener('click', () => {
-                        console.log(item);
                         selectedLocation = item;
                         list.innerHTML = '';
                         list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
                         document.getElementById('location').value = item.display_name;
-
-                        // 2. Usamos la instancia del mapa para mover el marcador a las nuevas coordenadas
-                        if (mapInstance && item.lat && item.lon) {
-                             mapInstance.updateMapPosition(item.lat, item.lon);
-                        }
                     })
-                    console.log(selectedLocation);
-                    
                 })
             } else {
                 list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
