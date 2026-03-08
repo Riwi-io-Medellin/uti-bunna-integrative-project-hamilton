@@ -1,6 +1,6 @@
 //auth.service.js
 import * as userRepository from "../repositories/user.repository.js"
-import {hashPassword} from "../utils/hash.js"
+import {hashPassword, verifyPassword} from "../utils/hash.js"
 import {generateToken} from "../utils/jwt.js"
 import {getRouteFromOSRM} from "../utils/route.js"
 
@@ -55,6 +55,32 @@ export const register = async (userData) => {
   return {
     user: user.rows[0],
     driver: driverData ? driverData.rows[0] : null,
+    token
+  }
+}
+
+export const login = async (credentials) => {
+  const { email, password } = credentials
+
+  const user = await userRepository.findUserByEmail(email)
+
+  if (user.rowCount === 0) {
+    throw new Error("Invalid credentials")
+  }
+
+  const isValidPassword = await verifyPassword(password, user.rows[0].password_hash)
+
+  if (!isValidPassword) {
+    throw new Error("Invalid credentials")
+  }
+
+  const token = generateToken({
+    id: user.rows[0].user_id,
+    role: user.rows[0].role
+  })
+
+  return {
+    user: user.rows[0],
     token
   }
 }
