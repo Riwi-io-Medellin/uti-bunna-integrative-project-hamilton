@@ -130,18 +130,6 @@ export function initRegisterForm() {
     document.getElementById('registerForm')?.addEventListener('submit', (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        
-        // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
-        const currentMarkerPosition = getMarkerPosition();
-
-        if (currentMarkerPosition) {
-             formData.append('lat', currentMarkerPosition.lat);
-             formData.append('lon', currentMarkerPosition.lon);
-        } else if (selectedLocation) {
-             // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
-             formData.append('lat', selectedLocation.lat);
-             formData.append('lon', selectedLocation.lon);
-        }
 
         // Siempre mandamos el display_name del input original o de selectedLocation
         if (selectedLocation) {
@@ -150,8 +138,34 @@ export function initRegisterForm() {
              formData.append('display_name', document.getElementById('location').value);
         }
 
+        // Convertimos el FormData a un objeto de JavaScript estándar primero
         const data = Object.fromEntries(formData.entries())
+
+        // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
+        const currentMarkerPosition = getMarkerPosition();
+
+        if (currentMarkerPosition) {
+            // Asignamos el objeto directamente a "data" en lugar de "formData"
+            data.location = {
+                type: "Point", 
+                coordinates: [currentMarkerPosition.lon, currentMarkerPosition.lat]
+            };
+        } else if (selectedLocation) {
+             // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
+             data.location = {
+                 type: "Point", 
+                 coordinates: [selectedLocation.lon, selectedLocation.lat]
+             };
+        }
+
         console.log(data);
+        
+        // Ahora puedes enviar "data" a tu base de datos convirtiéndolo a JSON:
+        // fetch('tu-api/endpoint', { 
+        //    method: 'POST', 
+        //    headers: { 'Content-Type': 'application/json' }, 
+        //    body: JSON.stringify(data)
+        // })
     })
     document.getElementById('location').addEventListener('input', async (e) => {
         clearTimeout(timeoutId);
