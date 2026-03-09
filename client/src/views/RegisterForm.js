@@ -26,7 +26,7 @@ export function RegisterForm() {
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                    <input required id="name" name="name" type="text" placeholder="John Doe" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    <input required id="fullName" name="fullName" type="text" placeholder="John Doe" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
@@ -93,13 +93,13 @@ export function RegisterForm() {
             <h3 class="text-sm font-bold text-gray-800 mb-3">Select your day trip</h3>
             <div class="grid grid-cols-2 gap-4">
                 <label class="cursor-pointer">
-                    <input type="radio" name="day-trip" class="peer sr-only" value="am">
+                    <input type="radio" name="shift" class="peer sr-only" value="morning">
                     <div class="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-gray-100 text-gray-400 font-bold transition-all peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-50/50">
                         <i class="fa-solid fa-sun"></i> AM
                     </div>
                 </label>
                 <label class="cursor-pointer">
-                    <input type="radio" name="day-trip" class="peer sr-only" value="pm">
+                    <input type="radio" name="shift" class="peer sr-only" value="evening">
                     <div class="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-gray-100 text-gray-400 font-bold transition-all peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-50/50">
                         <i class="fa-solid fa-moon"></i> PM
                     </div>
@@ -145,13 +145,17 @@ export function initRegisterForm() {
 
             // Siempre mandamos el display_name del input original o de selectedLocation
             if (selectedLocation) {
-                formData.append('display_name', selectedLocation.display_name);
+                formData.append('address', selectedLocation.display_name);
             } else {
-                formData.append('display_name', document.getElementById('location').value);
+                formData.append('address', document.getElementById('location').value);
             }
 
+            //eliminar la confirmacion
+            formData.delete('check-password')
             // Convertimos el FormData a un objeto de JavaScript estándar primero
             const data = Object.fromEntries(formData.entries())
+            //Obtener las pass y enviarla por el object
+            data.password = document.getElementById('password').value
 
             // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
             const currentMarkerPosition = getMarkerPosition();
@@ -169,6 +173,12 @@ export function initRegisterForm() {
                     coordinates: [selectedLocation.lon, selectedLocation.lat]
                 };
             }
+
+            fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
             console.log(data);
             console.log(validatePassword())
         }
