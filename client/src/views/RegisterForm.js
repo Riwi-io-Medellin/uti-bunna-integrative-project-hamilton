@@ -1,5 +1,5 @@
 import { initMap, Map } from "../components/Map.js"
-import { getNaturalAddress, getMarkerPosition } from "../utils/utils.js"
+import { getNaturalAddress, getMarkerPosition, updateMapPosition } from "../utils/utils.js"
 
 export function RegisterForm() {
     return `
@@ -31,6 +31,15 @@ export function RegisterForm() {
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
                     <input required id="email" name="email" type="email" placeholder="john@example.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                 </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Address</label>
+                    <input required id="password" name="password" type="password" placeholder="***********" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div><div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Address</label>
+                    <input required id="password" name="password" type="password" placeholder="***********" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
                     <div class="flex gap-2">
@@ -207,6 +216,7 @@ export function initRegisterForm() {
                         list.innerHTML = '';
                         list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
                         document.getElementById('location').value = item.display_name;
+                        updateMapPosition(item.lat, item.lon)
                     })
                 })
             } else {
