@@ -10,7 +10,7 @@ export function RegisterForm() {
         
         <div class="px-6 pt-8 pb-4">
             <div class="flex items-center justify-between mb-6">
-                <button class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></button>
+                <a href="/login" class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></a>
                 <h1 class="text-lg font-bold text-gray-800">Registration</h1>
                 <div class="w-6"></div> </div>
             
@@ -132,12 +132,12 @@ export function RegisterForm() {
    `
 }
 
-export function initRegisterForm() {
+export async function initRegisterForm() {
     initMap()
     let selectedLocation = null;
     let timeoutId;
 
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
 
@@ -174,13 +174,39 @@ export function initRegisterForm() {
                 };
             }
 
-            fetch('http://localhost:3000/api/auth/register', {
+            const res = await fetch('http://localhost:3000/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            console.log(data);
-            console.log(validatePassword())
+            const json = await res.json();
+            console.log(json);
+            console.log(res); 
+            if (res.ok) {
+                Toastify({
+                    text: "User registered successfully",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#4f39f6",
+                    },
+                }).showToast();
+                localStorage.setItem('token', JSON.stringify(json.token));
+                setTimeout(() => {
+                    window.location.href = "/home";
+                }, 1000);
+            }else{
+                Toastify({
+                    text: json.errors[0].message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "red",
+                    },
+                }).showToast();
+            }
         }
         else {
             console.log('incorrecta');
