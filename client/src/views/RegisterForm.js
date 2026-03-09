@@ -208,10 +208,6 @@ export async function initRegisterForm() {
                 }).showToast();
             }
         }
-        else {
-            console.log('incorrecta');
-
-        }
 
 
 
