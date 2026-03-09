@@ -1,5 +1,6 @@
 import { initMap, Map } from "../components/Map.js"
 import { getNaturalAddress, getMarkerPosition, updateMapPosition } from "../utils/utils.js"
+import Toastify from 'toastify-js'
 
 export function RegisterForm() {
     return `
@@ -33,11 +34,11 @@ export function RegisterForm() {
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Address</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
                     <input required id="password" name="password" type="password" placeholder="***********" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                 </div><div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Address</label>
-                    <input required id="password" name="password" type="password" placeholder="***********" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Confirm password</label>
+                    <input required id="check-password" name="check-password" type="password" placeholder="***********" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                 </div>
 
                 <div>
@@ -140,35 +141,45 @@ export function initRegisterForm() {
         e.preventDefault()
         const formData = new FormData(e.target)
 
-        // Siempre mandamos el display_name del input original o de selectedLocation
-        if (selectedLocation) {
-             formData.append('display_name', selectedLocation.display_name);
-        } else {
-             formData.append('display_name', document.getElementById('location').value);
+        if (validatePassword()) {
+
+            // Siempre mandamos el display_name del input original o de selectedLocation
+            if (selectedLocation) {
+                formData.append('display_name', selectedLocation.display_name);
+            } else {
+                formData.append('display_name', document.getElementById('location').value);
+            }
+
+            // Convertimos el FormData a un objeto de JavaScript estándar primero
+            const data = Object.fromEntries(formData.entries())
+
+            // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
+            const currentMarkerPosition = getMarkerPosition();
+
+            if (currentMarkerPosition) {
+                // Asignamos el objeto directamente a "data" en lugar de "formData"
+                data.location = {
+                    type: "Point",
+                    coordinates: [currentMarkerPosition.lon, currentMarkerPosition.lat]
+                };
+            } else if (selectedLocation) {
+                // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
+                data.location = {
+                    type: "Point",
+                    coordinates: [selectedLocation.lon, selectedLocation.lat]
+                };
+            }
+            console.log(data);
+            console.log(validatePassword())
+        }
+        else {
+            console.log('incorrecta');
+
         }
 
-        // Convertimos el FormData a un objeto de JavaScript estándar primero
-        const data = Object.fromEntries(formData.entries())
 
-        // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
-        const currentMarkerPosition = getMarkerPosition();
 
-        if (currentMarkerPosition) {
-            // Asignamos el objeto directamente a "data" en lugar de "formData"
-            data.location = {
-                type: "Point", 
-                coordinates: [currentMarkerPosition.lon, currentMarkerPosition.lat]
-            };
-        } else if (selectedLocation) {
-             // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
-             data.location = {
-                 type: "Point", 
-                 coordinates: [selectedLocation.lon, selectedLocation.lat]
-             };
-        }
 
-        console.log(data);
-        
         // Ahora puedes enviar "data" a tu base de datos convirtiéndolo a JSON:
         // fetch('tu-api/endpoint', { 
         //    method: 'POST', 
@@ -224,4 +235,30 @@ export function initRegisterForm() {
             }
         }, 1000);
     })
+}
+
+function validatePassword() {
+    const password = document.getElementById('password')
+    const checkPassword = document.getElementById('check-password')
+    if (password.value === checkPassword.value) {
+        password.classList.remove('border-red-500')
+        checkPassword.classList.remove('border-red-500')
+        return true
+    }
+    else {
+        Toastify({
+            text: "Passwords must match",
+            duration: 5000,
+            gravity: "top", // `top` or `bottom`
+            position: "left", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+                background: "red",
+            },
+        }).showToast();
+        password.classList.add('border-red-500')
+        checkPassword.classList.add('border-red-500')
+        return false
+    }
+
 }
