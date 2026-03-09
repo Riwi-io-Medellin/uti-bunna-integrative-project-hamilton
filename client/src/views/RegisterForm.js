@@ -132,32 +132,37 @@ export function RegisterForm() {
    `
 }
 
+//function to init register form
 export async function initRegisterForm() {
-    initMap()
+    initMap() //init map
+
+    //variable to store selected location
     let selectedLocation = null;
+    //variable to store timeout id
     let timeoutId;
 
     document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
 
+        //validate password
         if (validatePassword()) {
 
-            // Siempre mandamos el display_name del input original o de selectedLocation
+            //always send the display_name of the original input or selectedLocation
             if (selectedLocation) {
                 formData.append('address', selectedLocation.display_name);
             } else {
                 formData.append('address', document.getElementById('location').value);
             }
 
-            //eliminar la confirmacion
+            //delete the confirmation password
             formData.delete('check-password')
-            // Convertimos el FormData a un objeto de JavaScript estándar primero
+            //convert the FormData to a standard JavaScript object first
             const data = Object.fromEntries(formData.entries())
-            //Obtener las pass y enviarla por el object
+            //get the password and send it through the object
             data.password = document.getElementById('password').value
 
-            // Obtenemos la última posición actual del marcador (incluso si el usuario lo arrastró)
+            //get the last current position of the marker (even if the user dragged it)
             const currentMarkerPosition = getMarkerPosition();
 
             if (currentMarkerPosition) {
@@ -174,14 +179,15 @@ export async function initRegisterForm() {
                 };
             }
 
+            //send the data to the server
             const res = await fetch('https://uti-bunna-server.onrender.com/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
+            //convert response to json
             const json = await res.json();
-            console.log(json);
-            console.log(res); 
+            //if response is ok
             if (res.ok) {
                 Toastify({
                     text: "User registered successfully",
@@ -211,17 +217,9 @@ export async function initRegisterForm() {
 
 
 
-
-        // Ahora puedes enviar "data" a tu base de datos convirtiéndolo a JSON:
-        // fetch('tu-api/endpoint', { 
-        //    method: 'POST', 
-        //    headers: { 'Content-Type': 'application/json' }, 
-        //    body: JSON.stringify(data)
-        // })
     })
+    //add event listener to location input, when the user types something, it will show a list of suggestions
     document.getElementById('location').addEventListener('input', async (e) => {
-        clearTimeout(timeoutId);
-
         const inputValue = e.target.value.toLowerCase().trim();
         const list = document.getElementById('location-list');
 
@@ -231,18 +229,15 @@ export async function initRegisterForm() {
             return;
         }
 
-        timeoutId = setTimeout(async () => {
             let results = await getNaturalAddress(inputValue)
             list.innerHTML = '';
 
             if (results && results.length > 0) {
-                // Mejora de estilos en el ul
                 list.classList.add('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'overflow-hidden', 'divide-y', 'divide-gray-50');
 
                 results.forEach(item => {
                     const li = document.createElement('li');
 
-                    // Highlight the display name with better typography and icons
                     li.innerHTML = `
                         <div class="flex items-start gap-3">
                             <i class="fa-solid fa-map-pin text-indigo-400 mt-1"></i>
@@ -250,7 +245,6 @@ export async function initRegisterForm() {
                         </div>
                     `;
 
-                    // Mejora de estilos en el li
                     li.classList.add('cursor-pointer', 'hover:bg-indigo-50', 'p-3', 'transition-colors', 'duration-150');
                     list.appendChild(li);
 
@@ -265,7 +259,7 @@ export async function initRegisterForm() {
             } else {
                 list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
             }
-        }, 1000);
+        
     })
 }
 
