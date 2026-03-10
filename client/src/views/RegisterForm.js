@@ -180,7 +180,7 @@ export async function initRegisterForm() {
             }
 
             //send the data to the server
-            const res = await fetch('https://uti-bunna-server.onrender.com/api/auth/register', {
+            const res = await fetch('https://uti-bunna-integrative-project-hamilton.onrender.com/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

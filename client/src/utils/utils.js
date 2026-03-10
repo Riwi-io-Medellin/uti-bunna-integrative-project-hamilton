@@ -38,36 +38,36 @@ export function useMap() {
   }).addTo(map);
 
   getAddress(lat, lng);
-  marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+  marker = L.marker([lat, lng]).addTo(map);
 
-  /*  obtenerUbicacion()
+/*   obtenerUbicacion()
      .then(pos => {
        console.log("Lat:", pos.coords.latitude);
        console.log("Lon:", pos.coords.longitude);
  
-       let lat = pos.coords.latitude;
-       let lng = pos.coords.longitude;
+       let latCurrent = pos.coords.latitude;
+       let lngCurrent = pos.coords.longitude;
  
        // Centrar mapa en ubicación actual
-       map.setView([lat, lng], 16);
+       map.setView([latCurrent, lngCurrent], 16);
  
        // Crear marcador inicial
-       marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+       marker = L.marker([latCurrent, lngCurrent]).addTo(map);
  
  
-       getAddress(lat, lng);
+       getAddress(latCurrent, lngCurrent);
+       
  
-       map.setView([lat, lng], 16);
+       map.setView([latCurrent, lngCurrent], 16);
        if (marker) {
-         marker.setLatLng([lat, lng]);
+         marker.setLatLng([latCurrent, lngCurrent]);
        } else {
-         marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+         marker = L.marker([latCurrent, lngCurrent]).addTo(map);
        }
      })
      .catch(err => {
        console.error(err.message);
-     });
-  */
+     }); */
 
 
   map.on('click', function (e) {
@@ -77,7 +77,7 @@ export function useMap() {
     if (marker) {
       marker.setLatLng(e.latlng);
     } else {
-      marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+      marker = L.marker(e.latlng).addTo(map);
     }
 
     getAddress(lat, lng)
@@ -97,7 +97,7 @@ export function updateMapPosition(lat, lng) {
   if (marker) {
     marker.setLatLng([lat, lng]);
   } else {
-    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    marker = L.marker([lat, lng]).addTo(map);
   }
 }
 
