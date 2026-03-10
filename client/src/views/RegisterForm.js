@@ -146,13 +146,13 @@ export async function initRegisterForm() {
     document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault()
         const btnForm = e.target.querySelector('button')
-        btnForm.disabled = true
-        btnForm.querySelector('div').classList.remove('hidden')
-        btnForm.querySelector('span').classList.add('hidden')
         const formData = new FormData(e.target)
 
         //validate password
         if (validatePassword()) {
+            btnForm.disabled = true
+            btnForm.querySelector('div').classList.remove('hidden')
+            btnForm.querySelector('span').classList.add('hidden')
 
             //always send the display_name of the original input or selectedLocation
             if (selectedLocation) {
@@ -193,35 +193,56 @@ export async function initRegisterForm() {
             })
             //convert response to json
             const json = await res.json();
+
+            //get message error
+            const message = json?.errors?.[0]?.message || json?.message || "Unknown error";
             //if response is ok
-            if (res.ok) {
+            try {
+                if (res.ok) {
+                    Toastify({
+                        text: "User registered successfully",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#4f39f6",
+                        },
+                    }).showToast();
+                    localStorage.setItem('token', JSON.stringify(json.token));
+                    setTimeout(() => {
+                        window.location.href = "/home";
+                    }, 1000);
+                    btnForm.disabled = false
+                    btnForm.querySelector('div').classList.add('hidden')
+                    btnForm.querySelector('span').classList.remove('hidden')
+                } else {
+                    Toastify({
+                        text: message,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "red",
+                        },
+                    }).showToast();
+
+                }
+            } catch (error) {
                 Toastify({
-                    text: "User registered successfully",
+                    text: error,
                     duration: 3000,
                     gravity: "top",
                     position: "right",
-                    style: {
-                        background: "#4f39f6",
-                    },
+                    style: { background: "red" },
                 }).showToast();
-                localStorage.setItem('token', JSON.stringify(json.token));
-                setTimeout(() => {
-                    window.location.href = "/home";
-                }, 1000);
+            } finally {
                 btnForm.disabled = false
                 btnForm.querySelector('div').classList.add('hidden')
                 btnForm.querySelector('span').classList.remove('hidden')
-            } else {
-                Toastify({
-                    text: json.errors[0].message,
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    style: {
-                        background: "red",
-                    },
-                }).showToast();
             }
+
+            
+
         }
 
 
@@ -285,7 +306,7 @@ function validatePassword() {
             text: "Passwords must match",
             duration: 5000,
             gravity: "top", // `top` or `bottom`
-            position: "left", // `left`, `center` or `right`
+            position: "rigth", // `left`, `center` or `right`
             stopOnFocus: true, // Prevents dismissing of toast on hover
             style: {
                 background: "red",
