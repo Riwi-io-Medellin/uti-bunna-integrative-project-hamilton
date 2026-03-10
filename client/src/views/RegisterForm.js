@@ -119,15 +119,17 @@ export function RegisterForm() {
             ${Map()}
 
         <div class="px-6 py-8">
-            <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] mb-4">
-                Complete Registration
+            <button type="sumbit" class="flex justify-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] mb-4">
+                <span>Complete Registration</span>
+                <div class="hidden animate-spin rounded-full h-10 w-10 border-4 border-b-current border-gray-200"></div>
             </button>
             <p class="text-[10px] text-center text-gray-400 leading-tight">
                 By clicking "Complete Registration", you agree to Uti Bunna's <br>
                 <a href="#" class="text-indigo-400 underline">Terms of Service</a> and <a href="#" class="text-indigo-400 underline">Privacy Policy</a>.
-            </p>
+                </p>
         </div>
     </div>
+
 </form>
    `
 }
@@ -143,6 +145,10 @@ export async function initRegisterForm() {
 
     document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault()
+        const btnForm = e.target.querySelector('button')
+        btnForm.disabled = true
+        btnForm.querySelector('div').classList.remove('hidden')
+        btnForm.querySelector('span').classList.add('hidden')
         const formData = new FormData(e.target)
 
         //validate password
@@ -202,7 +208,10 @@ export async function initRegisterForm() {
                 setTimeout(() => {
                     window.location.href = "/home";
                 }, 1000);
-            }else{
+                btnForm.disabled = false
+                btnForm.querySelector('div').classList.add('hidden')
+                btnForm.querySelector('span').classList.remove('hidden')
+            } else {
                 Toastify({
                     text: json.errors[0].message,
                     duration: 3000,
@@ -229,37 +238,37 @@ export async function initRegisterForm() {
             return;
         }
 
-            let results = await getNaturalAddress(inputValue)
-            list.innerHTML = '';
+        let results = await getNaturalAddress(inputValue)
+        list.innerHTML = '';
 
-            if (results && results.length > 0) {
-                list.classList.add('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'overflow-hidden', 'divide-y', 'divide-gray-50');
+        if (results && results.length > 0) {
+            list.classList.add('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'overflow-hidden', 'divide-y', 'divide-gray-50');
 
-                results.forEach(item => {
-                    const li = document.createElement('li');
+            results.forEach(item => {
+                const li = document.createElement('li');
 
-                    li.innerHTML = `
+                li.innerHTML = `
                         <div class="flex items-start gap-3">
                             <i class="fa-solid fa-map-pin text-indigo-400 mt-1"></i>
                             <span class="text-sm text-gray-700 leading-tight">${item.display_name}</span>
                         </div>
                     `;
 
-                    li.classList.add('cursor-pointer', 'hover:bg-indigo-50', 'p-3', 'transition-colors', 'duration-150');
-                    list.appendChild(li);
+                li.classList.add('cursor-pointer', 'hover:bg-indigo-50', 'p-3', 'transition-colors', 'duration-150');
+                list.appendChild(li);
 
-                    li.addEventListener('click', () => {
-                        selectedLocation = item;
-                        list.innerHTML = '';
-                        list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
-                        document.getElementById('location').value = item.display_name;
-                        updateMapPosition(item.lat, item.lon)
-                    })
+                li.addEventListener('click', () => {
+                    selectedLocation = item;
+                    list.innerHTML = '';
+                    list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
+                    document.getElementById('location').value = item.display_name;
+                    updateMapPosition(item.lat, item.lon)
                 })
-            } else {
-                list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
-            }
-        
+            })
+        } else {
+            list.classList.remove('rounded-xl', 'border', 'border-gray-100', 'mt-3', 'shadow-md', 'bg-white', 'divide-y', 'divide-gray-50');
+        }
+
     })
 }
 
