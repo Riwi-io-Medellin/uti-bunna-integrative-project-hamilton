@@ -14,12 +14,12 @@ export function router() {
   const privateRoutes = ['home']
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
-    location.hash = '/home'
+    location.hash = '#/home'
     return
   }
 
   if (!isLoggedIn() && privateRoutes.includes(route)) {
-    location.hash = '/login'
+    location.hash = '#/login'
     return
   }
 
@@ -32,7 +32,7 @@ export function router() {
   const routeConfig = routes[route]
 
   if (!routeConfig) {
-    location.hash = '/login'
+    location.hash = '#/login'
     return
   }
 

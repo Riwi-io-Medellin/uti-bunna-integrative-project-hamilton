@@ -210,7 +210,7 @@ export async function initRegisterForm() {
                     }).showToast();
                     localStorage.setItem('token', JSON.stringify(json.token));
                     setTimeout(() => {
-                        window.location.href = "/home";
+                        window.location = "#/home";
                     }, 1000);
                     btnForm.disabled = false
                     btnForm.querySelector('div').classList.add('hidden')
