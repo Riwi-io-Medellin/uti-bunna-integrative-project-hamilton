@@ -1,4 +1,4 @@
-import { setSession } from '../utils/utils.js'
+import { setSession } from "../utils/utils.js";
 
 export function LoginView() {
   return `
@@ -78,36 +78,36 @@ export function LoginView() {
         <p class="text-[11px] text-gray-400 uppercase tracking-wide">© 2026 Uti Bunna. Todos los derechos reservados.</p>
       </footer>
     </div>
-  `
+  `;
 }
 
 export function initLoginView() {
-  document.getElementById('signInBtn')?.addEventListener('click', () => {
-    const email    = document.querySelector('input[type="email"]').value
-    const password = document.getElementById('passInput').value
+  document.getElementById("signInBtn")?.addEventListener("click", () => {
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.getElementById("passInput").value;
 
     if (email && password) {
-      setSession('token-fake-123')
-      location.hash = '/home'
+      setSession("token-fake-123");
+      location.hash = "/home";
     } else {
-      alert('Credenciales incorrectas')
+      alert("Credenciales incorrectas");
     }
-  })
+  });
 
-  document.getElementById('registerLink')?.addEventListener('click', (e) => {
-    e.preventDefault()
-    location.hash = '/register'
-  })
+  document.getElementById("registerLink")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    location.hash = "/register";
+  });
 
-  document.getElementById('togglePassBtn')?.addEventListener('click', () => {
-    const input  = document.getElementById('passInput')
-    const icon   = document.getElementById('eyeIcon')
-    const isPass = input.type === 'password'
+  document.getElementById("togglePassBtn")?.addEventListener("click", () => {
+    const input = document.getElementById("passInput");
+    const icon = document.getElementById("eyeIcon");
+    const isPass = input.type === "password";
 
-    input.type = isPass ? 'text' : 'password'
+    input.type = isPass ? "text" : "password";
 
     icon.innerHTML = isPass
       ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
-      : `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>`
-  })
+      : `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>`;
+  });
 }
