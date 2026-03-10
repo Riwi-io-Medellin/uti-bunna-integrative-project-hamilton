@@ -35,17 +35,28 @@ export const registerSchema = {
       required: ["type", "coordinates"],
       properties: {
         type: {
-          type: "string",
-          enum: ["Point"]
+        type: "string",
+        enum: ["Point"]
         },
-        coordinates: {
-          type: "array",
-          items: { type: "number" },
-          minItems: 2,
-          maxItems: 2
+    coordinates: {
+      type: "array",
+      minItems: 2,
+      maxItems: 2,
+      prefixItems: [
+        {
+          type: "number",
+          minimum: -75.68319749575764,
+          maximum: -75.51145782249795
+        },
+        {
+          type: "number",
+          minimum: 6.121219829039681,
+          maximum: 6.393028475741706
         }
-      }
+      ]
     }
+  }
+}
   }
 }
 
