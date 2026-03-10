@@ -1,9 +1,9 @@
 import * as matchService from "../services/match.service.js"
 
 export const getMatches = async (req, res, next) => {
-  const driverId = parseInt(req.params.driverId)
+  const driverId = req.user.id
   
-  if (isNaN(driverId)) {
+  if (!driverId) {
     return res.status(400).json({ error: "Invalid driver id" })
   }
   
