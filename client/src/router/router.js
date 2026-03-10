@@ -15,13 +15,13 @@ export function router() {
   const privateRoutes = ["home"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
-    location.hash = "/home";
-    return;
+    location.hash = '#/home'
+    return
   }
 
   if (!isLoggedIn() && privateRoutes.includes(route)) {
-    location.hash = "/login";
-    return;
+    location.hash = '#/login'
+    return
   }
 
   const routes = {
@@ -34,8 +34,8 @@ export function router() {
   const routeConfig = routes[route];
 
   if (!routeConfig) {
-    location.hash = "/landingPage";
-    return;
+    location.hash = '#/login'
+    return
   }
 
   render(routeConfig.view());
