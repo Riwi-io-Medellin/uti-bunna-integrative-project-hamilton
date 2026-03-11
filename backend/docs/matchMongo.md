@@ -21,6 +21,41 @@ A match document is passenger-centric:
 }
 ```
 
+## Reproducible Setup for New Clones
+
+Use these steps so anyone cloning the repository can run the same MongoDB flow.
+
+1. Install dependencies from lock file:
+
+```bash
+cd backend
+npm ci
+```
+
+2. Create local environment file from template:
+
+
+3. Ensure `MONGODB_URI` points to local Docker Mongo:
+
+```dotenv
+MONGODB_URI=mongodb://localhost:27017/uti_bunna_matches
+```
+
+4. Start only MongoDB with compose:
+
+```bash
+docker compose -f docker-compose.mongo.yml up -d
+```
+
+5. Start backend:
+
+```bash
+npm start
+```
+
+The project does not require committed `node_modules`.
+`package-lock.json` + `npm ci` ensure all users install the same dependency tree.
+
 ## Docker Compose (MongoDB Only)
 
 A dedicated compose file was added to run only MongoDB:
