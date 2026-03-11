@@ -105,10 +105,10 @@ export function initLoginView() {
       const json = await res.json();
 
       if (res.ok) {
-        // Guardar token en localStorage
+        // Save tokens in localStorage
         localStorage.setItem("token", json.token);
         setSession(json.token, json.user);
-        // Redirigir al home
+        // Redirect to home
         location.hash = "/home";
       } else {
         Toastify({
