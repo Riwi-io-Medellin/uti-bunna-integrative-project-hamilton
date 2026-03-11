@@ -1,46 +1,43 @@
 export function isLoggedIn() {
-  return localStorage.getItem('token') !== null
+  return localStorage.getItem("token") !== null;
 }
-export function setSession(token) {
-  localStorage.setItem('token', token)
+
+export function setSession(token, user) {
+  localStorage.setItem("token", token);
+  localStorage.setItem("user", JSON.stringify(user));
 }
+
 export function clearSession() {
-  localStorage.removeItem('token')
+  localStorage.clear();
 }
-
-
 
 //Map functions
 let map;
 let marker;
 function obtenerUbicacion() {
   return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(
-      resolve,
-      reject,
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    );
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    });
   });
 }
 export function useMap() {
-  var lat = 6.219186319336883
-  var lng = -75.5836256336475
+  var lat = 6.219186319336883;
+  var lng = -75.5836256336475;
 
   /* Dibujar el mapa en medellín */
-  map = L.map('map').setView([lat, lng], 16);
+  map = L.map("map").setView([lat, lng], 16);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap",
   }).addTo(map);
 
   getAddress(lat, lng);
   marker = L.marker([lat, lng]).addTo(map);
 
-/*   obtenerUbicacion()
+  /*   obtenerUbicacion()
      .then(pos => {
        console.log("Lat:", pos.coords.latitude);
        console.log("Lon:", pos.coords.longitude);
@@ -69,8 +66,7 @@ export function useMap() {
        console.error(err.message);
      }); */
 
-
-  map.on('click', function (e) {
+  map.on("click", function (e) {
     lat = e.latlng.lat;
     lng = e.latlng.lng;
 
@@ -80,16 +76,14 @@ export function useMap() {
       marker = L.marker(e.latlng).addTo(map);
     }
 
-    getAddress(lat, lng)
+    getAddress(lat, lng);
 
-    marker.on('dragend', function (e) {
+    marker.on("dragend", function (e) {
       var position = marker.getLatLng();
-
     });
-    return { lat, lng }
-
+    return { lat, lng };
   });
-  return { lat, lng }
+  return { lat, lng };
 }
 
 export function updateMapPosition(lat, lng) {
@@ -110,22 +104,24 @@ export function getMarkerPosition() {
 }
 
 function getAddress(lat, lng) {
-  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('location').value = data.display_name;
+  fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      document.getElementById("location").value = data.display_name;
     });
 }
 
 export async function getNaturalAddress(busqueda) {
-
   try {
     const query = encodeURIComponent(busqueda);
     const viewbox = "-76.05,6.65,-75.20,5.85";
 
-    if (!query || query.trim().length < 3) return
+    if (!query || query.trim().length < 3) return;
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=co&viewbox=${viewbox}&bounded=1&limit=40`);
+      `https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=co&viewbox=${viewbox}&bounded=1&limit=40`,
+    );
 
     const data = await response.json();
 
@@ -134,7 +130,6 @@ export async function getNaturalAddress(busqueda) {
     } else {
       return []; // mejor retornar algo consistente
     }
-
   } catch (err) {
     return null; // para manejar errores
   }
