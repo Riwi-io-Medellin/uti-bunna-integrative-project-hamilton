@@ -1,18 +1,8 @@
 import ListMatches from "../components/Driver/ListMatches.js";
+import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js";
 
 export async function MatchesView() {
-    //const token = (localStorage.getItem("token"));
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTcsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMyNTA0NzksImV4cCI6MTc3MzMzNjg3OX0.RhW5jW4fU25tl0mgFJv2x-xccuCSKc-GMDySLOGjroQ"
-
-    const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    const data = await response.json();
-    
+   
     return `
     <div class="bg-gray-50 font-sans flex justify-center">
 
@@ -32,21 +22,15 @@ export async function MatchesView() {
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">${data.total} Passengers Nearby</h2>
+                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Passengers Nearby</h2>
                     <p class="text-sm text-gray-400">Available on your current route</p>
                 </div>
-                <button class="bg-blue-50 p-3 rounded-xl text-blue-600">
-                    <i class="fas fa-sliders-h"></i>
-                </button>
             </div>
-            
-            <button class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 flex justify-center items-center gap-2 hover:bg-indigo-700 transition">
-                <i class="fas fa-user-plus"></i> Search for More Passengers
-            </button>
+
         </div>
 
-        <div>
-            ${ListMatches(data.matches)}
+        <div id="matches-list" class="px-6 space-y-4 pb-24">
+            ${SkeletonListMatches()}
         </div>
 
         <nav class="absolute bottom-0 w-full bg-white border-t border-gray-100 p-4 flex justify-between items-center px-8 shadow-2xl">
@@ -70,7 +54,20 @@ export async function MatchesView() {
     `
 }
 
-export function initMatchesView() {
+export async function initMatchesView() {
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTcsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMyNTA0NzksImV4cCI6MTc3MzMzNjg3OX0.RhW5jW4fU25tl0mgFJv2x-xccuCSKc-GMDySLOGjroQ"
+    const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    const data = await response.json();
+    const matchesList = document.getElementById("matches-list");
+    const totalPassengers = document.getElementById("total-passengers");
+    totalPassengers.innerHTML = data.total + " Passengers Nearby";
+    matchesList.innerHTML = ListMatches(data.matches);
  console.log("matches view");
 }
 

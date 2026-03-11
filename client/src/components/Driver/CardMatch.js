@@ -12,7 +12,6 @@ export function CardMatch(match) {
                             <p class="text-xs text-gray-400"><i class="fas fa-location-arrow text-blue-400"></i> 0.5 km away</p>
                         </div>
                     </div>
-                    <span class="bg-orange-50 text-orange-400 text-[10px] font-bold px-2 py-1 rounded-md uppercase">Pending</span>
                 </div>
                 <div class="flex justify-center">
                     <button class="w-[50%] bg-green-500 text-white py-2 rounded-xl flex justify-center items-center gap-2 text-sm font-bold">
