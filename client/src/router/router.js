@@ -13,7 +13,7 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["home"];
+  const privateRoutes = ["home" , "myroute",  "matches"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
     location.hash = '#/home'
@@ -31,6 +31,8 @@ export async function router() {
     register: { view: RegisterForm, init: initRegisterForm },
     home: { view: HomeView, init: initHomeView },
     matches: { view: MatchesView, init: initMatchesView },
+    myroute : {view: () => "<p>my route</p><a href='#/matches'>myroute</a>"}
+    
   };
 
   const routeConfig = routes[route];

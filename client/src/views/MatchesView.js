@@ -2,7 +2,7 @@ import ListMatches from "../components/Driver/ListMatches.js";
 
 export async function MatchesView() {
     //const token = (localStorage.getItem("token"));
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMxODc4MTAsImV4cCI6MTc3MzI3NDIxMH0.BUs-p9HUnw_2630UDWa_OLC1tCIUL-2pxtjKQsCwfnI"
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTcsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMyNTA0NzksImV4cCI6MTc3MzMzNjg3OX0.RhW5jW4fU25tl0mgFJv2x-xccuCSKc-GMDySLOGjroQ"
 
     const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
         method: "GET",
@@ -32,7 +32,7 @@ export async function MatchesView() {
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">${data.matches.length} Passengers Nearby</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">${data.total} Passengers Nearby</h2>
                     <p class="text-sm text-gray-400">Available on your current route</p>
                 </div>
                 <button class="bg-blue-50 p-3 rounded-xl text-blue-600">
@@ -45,25 +45,20 @@ export async function MatchesView() {
             </button>
         </div>
 
-       ${ListMatches(data.matches)}
+        <div>
+            ${ListMatches(data.matches)}
+        </div>
 
         <nav class="absolute bottom-0 w-full bg-white border-t border-gray-100 p-4 flex justify-between items-center px-8 shadow-2xl">
             <div class="flex flex-col items-center text-blue-600">
                 <i class="fas fa-th-large text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">DASHBOARD</span>
+                <span class="text-[10px] font-bold mt-1">PASSANGERS NEARBY</span>
             </div>
-            <div class="flex flex-col items-center text-gray-400">
+            <a href="#/myroute" class="flex flex-col items-center text-gray-400">
                 <i class="fas fa-map-signs text-xl"></i>
                 <span class="text-[10px] font-bold mt-1">ROUTE</span>
-            </div>
-            <div class="flex flex-col items-center text-gray-400">
-                <i class="fas fa-history text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">TRIPS</span>
-            </div>
-            <div class="flex flex-col items-center text-gray-400">
-                <i class="fas fa-wallet text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">EARNINGS</span>
-            </div>
+            </a>
+            
             <div class="flex flex-col items-center text-gray-400">
                 <i class="far fa-user text-xl"></i>
                 <span class="text-[10px] font-bold mt-1">PROFILE</span>

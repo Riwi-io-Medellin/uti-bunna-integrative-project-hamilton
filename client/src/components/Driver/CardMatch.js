@@ -14,12 +14,9 @@ export function CardMatch(match) {
                     </div>
                     <span class="bg-orange-50 text-orange-400 text-[10px] font-bold px-2 py-1 rounded-md uppercase">Pending</span>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button class="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center gap-2 text-sm font-bold">
+                <div class="flex justify-center">
+                    <button class="w-[50%] bg-green-500 text-white py-2 rounded-xl flex justify-center items-center gap-2 text-sm font-bold">
                         <a href="https://wa.me/57${match.phone}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    </button>
-                    <button class="border border-blue-200 text-blue-500 py-2 rounded-xl flex justify-center items-center gap-2 text-sm font-bold">
-                        <i class="far fa-check-circle"></i> Contacted
                     </button>
                 </div>
             </div>
