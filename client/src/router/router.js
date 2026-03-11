@@ -4,8 +4,9 @@ import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
 import { HomeView, initHomeView } from "../views/home.js";
 import { isLoggedIn } from "../utils/utils.js";
+import { initMatchesView, MatchesView } from "../views/MatchesView.js";
 
-export function router() {
+export async function router() {
   const hash = location.hash || "#/landingPage";
   if (!location.hash) location.hash = "#/";
 
@@ -29,6 +30,7 @@ export function router() {
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     home: { view: HomeView, init: initHomeView },
+    matches: { view: MatchesView, init: initMatchesView },
   };
 
   const routeConfig = routes[route];
@@ -38,7 +40,7 @@ export function router() {
     return
   }
 
-  render(routeConfig.view());
+  render(await routeConfig.view());
   routeConfig.init?.();
 }
 /* MODO DESARROLLO — Sin base de datos
