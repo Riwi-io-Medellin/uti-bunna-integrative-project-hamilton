@@ -1,4 +1,5 @@
 import { setSession } from "../utils/utils.js";
+import Toastify from "toastify-js";
 
 export function LoginView() {
   return `
@@ -82,15 +83,55 @@ export function LoginView() {
 }
 
 export function initLoginView() {
-  document.getElementById("signInBtn")?.addEventListener("click", () => {
+  document.getElementById("signInBtn")?.addEventListener("click", async () => {
     const email = document.querySelector('input[type="email"]').value;
     const password = document.getElementById("passInput").value;
 
-    if (email && password) {
-      setSession("token-fake-123");
-      location.hash = "/home";
-    } else {
-      alert("Credenciales incorrectas");
+    if (!email || !password) {
+      alert("Por favor completa ambos campos");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        "https://uti-bunna-integrative-project-hamilton.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        },
+      );
+
+      const json = await res.json();
+
+      if (res.ok) {
+        // Guardar token en localStorage
+        localStorage.setItem("token", json.token);
+        setSession(json.token, json.user);
+        // Redirigir al home
+        location.hash = "/home";
+      } else {
+        Toastify({
+          text: json.message,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          style: {
+            background: "red",
+          },
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error en login:", error);
+      Toastify({
+        text: error.message || "Error de conexión",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: {
+          background: "red",
+        },
+      }).showToast();
     }
   });
 
