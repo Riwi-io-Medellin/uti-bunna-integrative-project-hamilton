@@ -16,13 +16,13 @@ export async function router() {
   const privateRoutes = ["home" , "myroute",  "matches"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
-    location.hash = '#/home'
-    return
+    location.hash = "#/home";
+    return;
   }
 
   if (!isLoggedIn() && privateRoutes.includes(route)) {
-    location.hash = '#/login'
-    return
+    location.hash = "#/landingPage";
+    return;
   }
 
   const routes = {
@@ -38,14 +38,13 @@ export async function router() {
   const routeConfig = routes[route];
 
   if (!routeConfig) {
-    location.hash = '#/login'
-    return
+    location.hash = "#/landingPage";
+    return;
   }
 
   render(await routeConfig.view());
   routeConfig.init?.();
 }
-/* MODO DESARROLLO — Sin base de datos
- * Por ahora puedes ingresar cualquier email y contraseña para acceder.
- * Para cerrar sesión y volver al login, abre la consola (F12) y ejecuta:
- * localStorage.removeItem('token') y recarga la página */
+
+/* To log out and return to the login page, open the console (F12) and run:
+ * localStorage.removeItem('token') and refresh the page */
