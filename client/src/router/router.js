@@ -5,6 +5,7 @@ import { LoginView, initLoginView } from "../views/login.js";
 import { HomeView, initHomeView } from "../views/home.js";
 import { isLoggedIn } from "../utils/utils.js";
 import { initMatchesView, MatchesView } from "../views/MatchesView.js";
+import { profileSettings } from "../views/profileSettings.js";
 
 export async function router() {
   const hash = location.hash || "#/landingPage";
@@ -13,7 +14,7 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["home" , "myroute",  "matches"];
+  const privateRoutes = ["home", "myroute", "matches"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
     location.hash = "#/home";
@@ -31,8 +32,8 @@ export async function router() {
     register: { view: RegisterForm, init: initRegisterForm },
     home: { view: HomeView, init: initHomeView },
     matches: { view: MatchesView, init: initMatchesView },
-    myroute : {view: () => "<p>my route</p><a href='#/matches'>myroute</a>"}
-    
+    myroute: { view: () => "<p>my route</p><a href='#/matches'>myroute</a>" },
+    profileSettings: { view: profileSettings },
   };
 
   const routeConfig = routes[route];
