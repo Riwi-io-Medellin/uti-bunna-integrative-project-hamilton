@@ -4,15 +4,17 @@ import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
 import { HomeView, initHomeView } from "../views/home.js";
 import { isLoggedIn } from "../utils/utils.js";
+import { initMatchesView, MatchesView } from "../views/MatchesView.js";
+import { profileSettings } from "../views/profileSettings.js";
 
-export function router() {
+export async function router() {
   const hash = location.hash || "#/landingPage";
   if (!location.hash) location.hash = "#/";
 
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["home"];
+  const privateRoutes = ["home", "myroute", "matches"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
     location.hash = "#/home";
@@ -29,6 +31,9 @@ export function router() {
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     home: { view: HomeView, init: initHomeView },
+    matches: { view: MatchesView, init: initMatchesView },
+    myroute: { view: () => "<p>my route</p><a href='#/matches'>myroute</a>" },
+    profileSettings: { view: profileSettings },
   };
 
   const routeConfig = routes[route];
@@ -38,7 +43,7 @@ export function router() {
     return;
   }
 
-  render(routeConfig.view());
+  render(await routeConfig.view());
   routeConfig.init?.();
 }
 
