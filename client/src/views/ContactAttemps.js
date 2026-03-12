@@ -2,6 +2,7 @@ import ListMatches from "../components/Driver/ListMatches";
 import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches";
 
 export async function ContactAttemps(params) {
+    const user = JSON.parse(localStorage.getItem('user'));
     return `
 <div class="bg-gray-100 flex justify-center  min-h-screen">
 
@@ -10,11 +11,11 @@ export async function ContactAttemps(params) {
         <header class="p-6 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-orange-200 rounded-full overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${user.full_name}" alt="Avatar">
                 </div>
                 <div>
                     <p class="text-indigo-400 text-xs">Bienvenido</p>
-                    <h1 class="text-gray-800 font-bold text-lg leading-tight">Alex Johnson</h1>
+                    <h1 class="text-gray-800 font-bold text-lg leading-tight">${user.full_name}</h1>
                 </div>
             </div>
             <button class="border border-indigo-100 px-4 py-1.5 rounded-full flex items-center gap-2 text-indigo-500 text-xs font-semibold shadow-sm">
@@ -38,7 +39,7 @@ export async function ContactAttemps(params) {
         <section class="p-6 flex-1">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">Notificaciones</h3>
-                <span id="total-drivers" class="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-tighter">0</span>
+                <span id="total-drivers" class="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-tighter">...</span>
             </div>
 
             <div class="border border-indigo-50 rounded-3xl p-4 bg-white shadow-sm">
@@ -80,12 +81,9 @@ export async function ContactAttemps(params) {
 export async function initContactAttempsView() {
  const token = localStorage.getItem('token')
  const {user_id} = JSON.parse(localStorage.getItem('user'))
- console.log(user_id);
 
  
-
- 
-    const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/matches/90", {
+    const response = await fetch(`https://uti-bunna-integrative-project-hamilton.onrender.com/api/matches/${user_id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -93,12 +91,16 @@ export async function initContactAttempsView() {
         }
     })
     const data = await response.json();
-    console.log(data);
-    
     const contactAttempsList = document.getElementById("contact-attemps-list");
     const totalDrivers = document.getElementById("total-drivers");
-    totalDrivers.innerHTML = data.total + " Conductores";    
-    contactAttempsList.innerHTML = ListMatches(data.data.matches);
+    //if total is 0
+    totalDrivers.innerHTML = data.total > 0 ? data.total + " Conductores" : "No hay conductores";
+    //if response is 200
+    if(response.status === 200){
+        contactAttempsList.innerHTML = ListMatches(data.data.matches);
+    }else{
+        contactAttempsList.innerHTML = "<p class='text-center text-gray-400'>No hay conductores</p>";
+    }
 }
 
 
