@@ -3,7 +3,7 @@ import { recoverPassword } from "../services/user.service.js"
 export const updatePassword = async (req, res, next) => {
   try {
     const userId = req.user.id
-    const  newPassword  = req.body
+    const newPassword = req.body.password
 
     const updatedUser = await recoverPassword(userId, newPassword)
 
