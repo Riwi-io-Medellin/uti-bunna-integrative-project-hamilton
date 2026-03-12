@@ -41,3 +41,13 @@ export const findUserById = async (userId) => {
     `
   return pool.query(query, [userId])
 }
+
+export const updatePassword = async (userId, passwordHash) => {
+  const query = `
+    UPDATE users
+    SET password_hash = $2
+    WHERE user_id = $1
+    RETURNING user_id, email, updated_at
+  `
+  return pool.query(query, [userId, passwordHash])
+}
