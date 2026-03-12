@@ -1,4 +1,4 @@
-export const MATCH_COLLECTION = "matches"
+export const MATCH_COLLECTION = "matchForUser"
 
 export const ensureMatchIndexes = async (db) => {
   await db.collection(MATCH_COLLECTION).createIndex(

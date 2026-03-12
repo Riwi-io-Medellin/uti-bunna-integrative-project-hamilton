@@ -20,7 +20,8 @@ export const connectMongoDB = async () => {
 
   client = new MongoClient(uri)
   await client.connect()
-  database = client.db()
+  const dbName = process.env.MONGODB_DB_NAME || "matchForUser"
+  database = client.db(dbName)
   await ensureMatchIndexes(database)
 
   return database
