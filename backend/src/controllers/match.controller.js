@@ -9,8 +9,11 @@ export const getMatches = async (req, res, next) => {
   
   try {
     const matches = await matchService.getMatchesForDriver(driverId)
+    const driverResult = await matchService.getDriverRouteService(driverId)
+    const driverRoute = driverResult ? driverResult.driverRoute : null
     res.status(200).json({ 
       driverId, 
+      driverRoute,
       total: matches.length, 
       matches 
     })
