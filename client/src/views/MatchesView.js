@@ -55,7 +55,7 @@ export async function MatchesView() {
 }
 
 export async function initMatchesView() {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTcsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMyNTA0NzksImV4cCI6MTc3MzMzNjg3OX0.RhW5jW4fU25tl0mgFJv2x-xccuCSKc-GMDySLOGjroQ"
+ const token = localStorage.getItem('token')
     const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
         method: "GET",
         headers: {
