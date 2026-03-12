@@ -33,20 +33,15 @@ export async function MatchesView() {
             ${SkeletonListMatches()}
         </div>
 
-        <nav class="absolute bottom-0 w-full bg-white border-t border-gray-100 p-4 flex justify-between items-center px-8 shadow-2xl">
-            <div class="flex flex-col items-center text-blue-600">
-                <i class="fas fa-th-large text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">PASSANGERS NEARBY</span>
-            </div>
-            <a href="#/myroute" class="flex flex-col items-center text-gray-400">
-                <i class="fas fa-map-signs text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">ROUTE</span>
-            </a>
-            
-            <div class="flex flex-col items-center text-gray-400">
-                <i class="far fa-user text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">PROFILE</span>
-            </div>
+         <nav class="border-t border-gray-100 flex justify-around py-4 bg-white">
+            <button class="flex flex-col items-center gap-1 text-indigo-600">
+                <i class="fa-solid fa-house text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400">
+                <i class="fa-regular fa-user text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
+            </button>
         </nav>
 
     </div>
@@ -55,7 +50,7 @@ export async function MatchesView() {
 }
 
 export async function initMatchesView() {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTcsInJvbGUiOiJkcml2ZXIiLCJpYXQiOjE3NzMyNTA0NzksImV4cCI6MTc3MzMzNjg3OX0.RhW5jW4fU25tl0mgFJv2x-xccuCSKc-GMDySLOGjroQ"
+    const token = localStorage.getItem('token')
     const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
         method: "GET",
         headers: {
