@@ -68,7 +68,6 @@ export async function initMatchesView() {
     const totalPassengers = document.getElementById("total-passengers");
     totalPassengers.innerHTML = data.total + " Passengers Nearby";
     matchesList.innerHTML = ListMatches(data.matches);
- console.log("matches view");
 }
 
 //current route

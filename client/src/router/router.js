@@ -6,6 +6,7 @@ import { HomeView, initHomeView } from "../views/home.js";
 import { isLoggedIn } from "../utils/utils.js";
 import { initMatchesView, MatchesView } from "../views/MatchesView.js";
 import { profileSettings } from "../views/profileSettings.js";
+import { ContactAttemps, initContactAttempsView } from "../views/ContactAttemps.js";
 
 export async function router() {
   const hash = location.hash || "#/landingPage";
@@ -14,7 +15,7 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["home", "myroute", "matches"];
+  const privateRoutes = ["home", "myroute", "matches","contact-attemps"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
     location.hash = "#/home";
@@ -34,6 +35,7 @@ export async function router() {
     matches: { view: MatchesView, init: initMatchesView },
     myroute: { view: () => "<p>my route</p><a href='#/matches'>myroute</a>" },
     profileSettings: { view: profileSettings },
+    "contact-attemps": {view: ContactAttemps, init: initContactAttempsView}
   };
 
   const routeConfig = routes[route];

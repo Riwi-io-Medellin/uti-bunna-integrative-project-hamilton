@@ -9,7 +9,7 @@ export function CardMatch(match) {
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-800">${match.full_name}</h3>
-                            <p class="text-xs text-gray-400"><i class="fas fa-location-arrow text-blue-400"></i> 0.5 km away</p>
+                            <p class="text-xs text-gray-400 truncate max-w-[150px]" title="${match.address}"><i class="fas fa-location-arrow text-blue-400"></i> ${match.address}</p>
                         </div>
                     </div>
                 </div>
