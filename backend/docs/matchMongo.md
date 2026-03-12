@@ -32,7 +32,9 @@ cd backend
 npm ci
 ```
 
-2. Create local environment file from template:
+2. Create local environment file:
+
+Create `backend/.env` with your local configuration.
 
 
 3. Ensure `MONGODB_URI` points to local Docker Mongo:
@@ -88,35 +90,51 @@ Accept a passenger by the authenticated driver and store the match in MongoDB.
 
 Middlewares:
 
-- `authMiddleware`
-- `driverMiddleware`
+- `authMiddleware` — validates JWT and injects `req.user.id` (the driver's id)
+- `driverMiddleware` — ensures the authenticated user has the `driver` role
 
 Request params:
 
-- `passengerId` (string)
+- `passengerId` (string) — the `user_id` of the passenger to accept
 
-Request body:
+Request body: **none required**
 
-```json
-{
-  "full_name": "Driver Name",
-  "phone": "+573001112233"
-}
-```
+The driver's `full_name` and `phone` are resolved automatically from PostgreSQL using the authenticated driver's id. Nothing needs to be sent in the body.
 
-Validation:
+Example request (Postman):
 
-- If `full_name` or `phone` is missing, returns:
-
-```json
-{
-  "error": "full_name and phone are required"
-}
-```
+- Method: `POST`
+- URL: `{{BASE_URL}}/api/matches/:passengerId/accept`
+- Authorization tab → **Bearer Token** → paste the JWT obtained from login
+- Body: empty
 
 Success response: `200 OK`
 
-- Returns the updated passenger document in MongoDB.
+- Returns this payload:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "user_id": "5",
+    "matches": [
+      {
+        "driver_id": 2,
+        "full_name": "Driver Name",
+        "phone": "+573001112233",
+        "matched_at": "2026-03-12T10:00:00.000Z"
+      }
+    ]
+  },
+  "message": "match accepted successfully"
+}
+```
+
+Possible business errors:
+
+- `Driver not found`
+- `Passenger not found`
+- `Selected user is not a passenger`
 
 Duplicate prevention:
 
@@ -145,13 +163,42 @@ Request params:
 
 Success response: `200 OK`
 
-- Returns the passenger match document.
+- Returns this payload:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "user_id": "5",
+    "matches": [
+      {
+        "driver_id": 2,
+        "full_name": "Driver Name",
+        "phone": "+573001112233",
+        "matched_at": "2026-03-12T10:00:00.000Z"
+      }
+    ]
+  },
+  "message": "get matches successfully"
+}
+```
 
 Not found response: `404 Not Found`
 
 ```json
 {
-  "error": "No matches found for this passenger"
+  "ok": false,
+  "data": null,
+  "message": "No matches found for this passenger"
+}
+```
+
+Mongo route/middleware errors (for `/api/matches/*`) can return:
+
+```json
+{
+  "success": false,
+  "message": "..."
 }
 ```
 
@@ -174,15 +221,21 @@ MongoDB integration files:
   - Uses `updateOne` with `upsert: true` and duplicate prevention by `matches.driver_id`.
 
 - `src/services/match.mongo.service.js`
-  - `acceptPassenger(driverId, passengerId, driverInfo)`.
+  - `acceptPassenger(driverId, passengerId)` — validates driver and passenger existence in PostgreSQL, checks passenger role, then calls the repository.
   - `getPassengerMatches(passengerId)`.
 
 - `src/controllers/match.mongo.controller.js`
+  - `acceptPassenger` — reads `driverId` from `req.user.id` and `passengerId` from `req.params`. No body required.
+  - `getPassengerMatches` — reads `passengerId` from `req.params`.
   - Handles request validation, success responses, and error forwarding.
 
 - `src/routes/match.mongo.routes.js`
   - `POST /:passengerId/accept`.
   - `GET /:passengerId`.
+  - Applies `mongoNotFoundHandler` and `mongoErrorHandler` only for `/api/matches/*` routes.
+
+- `src/middlewares/match.mongo.error.middleware.js`
+  - Handles match Mongo route errors with `{ success, message, details? }`.
 
 App wiring:
 

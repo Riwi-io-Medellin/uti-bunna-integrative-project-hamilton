@@ -33,3 +33,11 @@ export const updateDriverRoute = async (userId, route, route_bbox) => {
 
   return pool.query(query, [userId, JSON.stringify(route), JSON.stringify(route_bbox)])
 }
+export const findUserById = async (userId) => {
+  const query = `
+    SELECT user_id, full_name, phone, role
+    FROM users
+    WHERE user_id = $1
+    `
+  return pool.query(query, [userId])
+}

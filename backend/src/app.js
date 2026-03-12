@@ -27,7 +27,6 @@ const initializeMongoDB = async () => {
 
 initializeMongoDB()
 
-// Global error-handling middleware
 app.use(errorHandler)
 
 export default app
