@@ -8,7 +8,8 @@ export async function findMatchesForDriver(driverId) {
       u.email,
       u.phone,
       u.shift,
-      ST_AsGeoJSON(u.location) AS location
+      u.address,
+      ST_AsGeoJSON(u.location) AS "location"
     FROM 
       users u
     WHERE 
@@ -32,3 +33,15 @@ export async function findMatchesForDriver(driverId) {
   
   return pool.query(query, [driverId])
 }
+
+export async function getDriverRoute(driverId) {
+  const query = `
+    SELECT ST_AsGeoJSON(route) AS "driverRoute"
+    FROM drivers
+    WHERE user_id = $1
+  `
+  
+  const result = await pool.query(query, [driverId])
+  return result.rows[0]
+}
+
