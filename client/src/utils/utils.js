@@ -140,3 +140,8 @@ export async function getNaturalAddress(busqueda) {
     return null; // para manejar errores
   }
 }
+
+
+export function useMapGoogle(){
+  
+}
