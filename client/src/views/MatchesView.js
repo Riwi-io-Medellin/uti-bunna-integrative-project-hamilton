@@ -7,9 +7,9 @@ export async function MatchesView() {
     return `
     <div class="bg-gray-50 font-sans flex justify-center">
 
+    ${Header()}
     <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative">
         
-        ${Header()}
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
