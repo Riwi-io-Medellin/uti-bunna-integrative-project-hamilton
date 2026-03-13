@@ -1,27 +1,12 @@
 import ListMatches from "../components/Driver/ListMatches";
 import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches";
+import { Header } from "../components/Header";
 
 export async function ContactAttemps(params) {
-    const user = JSON.parse(localStorage.getItem('user'));
     return `
 <div class="bg-gray-100 flex justify-center  min-h-screen">
 
-    <div class="bg-white w-[375px] min-h-[812px] rounded-[40px] shadow-2xl overflow-hidden flex flex-col font-sans">
-        
-        <header class="p-6 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-orange-200 rounded-full overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${user.full_name}" alt="Avatar">
-                </div>
-                <div>
-                    <p class="text-indigo-400 text-xs">Bienvenido</p>
-                    <h1 class="text-gray-800 font-bold text-lg leading-tight">${user.full_name}</h1>
-                </div>
-            </div>
-            <a href="#/profileSettings" class="border border-indigo-100 px-4 py-1.5 rounded-full flex items-center gap-2 text-indigo-500 text-xs font-semibold shadow-sm">
-                <i class="fa-regular fa-eye"></i> Ver perfil
-            </a>
-        </header>
+    ${Header()}
 
         <section class="px-6 py-2">
             <div class="bg-indigo-600 rounded-3xl p-6 text-white shadow-lg shadow-indigo-200">
@@ -80,8 +65,6 @@ export async function ContactAttemps(params) {
 
 export async function initContactAttempsView() {
  const token = localStorage.getItem('token')
- const {user_id} = JSON.parse(localStorage.getItem('user'))
-
  
     const response = await fetch(`https://uti-bunna-integrative-project-hamilton.onrender.com/api/matches/me`, {
         method: "GET",

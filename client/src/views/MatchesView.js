@@ -1,5 +1,6 @@
 import ListMatches from "../components/Driver/ListMatches.js";
 import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js";
+import { Header } from "../components/Header.js";
 
 export async function MatchesView() {
    
@@ -8,17 +9,7 @@ export async function MatchesView() {
 
     <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative">
         
-        <header class="p-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
-                    <i class="fas fa-car-side text-xl"></i>
-                </div>
-                <h1 class="text-xl font-bold text-blue-700">Uti Bunna</h1>
-            </div>
-            <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Online
-            </span>
-        </header>
+        ${Header()}
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
