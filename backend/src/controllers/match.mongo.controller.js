@@ -18,7 +18,15 @@ export const acceptPassenger = async (req, res, next) => {
 }
 
 export const getPassengerMatches = async (req, res, next) => {
-  const passengerId = req.params.passengerId
+  if (req.user.role !== "passenger") {
+    return res.status(403).json({
+      ok: false,
+      data: null,
+      message: "Only passengers can view matches"
+    })
+  }
+
+  const passengerId = req.user.id
 
   try {
     const matchDocument = await matchMongoService.getPassengerMatches(passengerId)

@@ -1,18 +1,21 @@
-# Match Mongo Endpoints
+# Mongo Match API Guide
 
-## Overview
+## What This Feature Does
 
-This feature adds MongoDB as a secondary database for accepted passenger-driver matches.
-PostgreSQL remains the primary database and is not replaced.
+This module stores accepted passenger-driver matches in MongoDB.
 
-A match document is passenger-centric:
+- PostgreSQL remains the source of truth for users and authentication.
+- MongoDB stores the accepted match history for each passenger.
+- Each document is grouped by passenger `user_id` and contains a `matches` array.
+
+Example Mongo document:
 
 ```json
 {
-  "user_id": "passenger_user_id",
+  "user_id": 103,
   "matches": [
     {
-      "driver_id": "driver_user_id",
+      "driver_id": 104,
       "full_name": "Driver Name",
       "phone": "+573001112233",
       "matched_at": "2026-03-11T20:00:00.000Z"
@@ -21,108 +24,89 @@ A match document is passenger-centric:
 }
 ```
 
-## Reproducible Setup for New Clones
+## Environment Assumptions
 
-Use these steps so anyone cloning the repository can run the same MongoDB flow.
+This guide assumes your infrastructure is already deployed in the cloud.
 
-1. Install dependencies from lock file:
+Before testing, make sure:
+
+1. The backend is already deployed or running.
+2. PostgreSQL is reachable from the backend deployment.
+3. MongoDB is reachable from the backend deployment.
+4. The environment variables are configured in your deployment platform.
+
+Minimum environment variables example:
+
+```dotenv
+PORT=3000
+DATABASE_URL=postgres://user:password@host:5432/database
+MONGODB_URI=mongodb://host:27017
+MONGODB_DB_NAME=matchForUser
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=1d
+```
+
+If you run the backend locally against cloud services, the usual command is:
 
 ```bash
 cd backend
-npm ci
-```
-
-2. Create local environment file:
-
-Create `backend/.env` with your local configuration.
-
-
-3. Ensure `MONGODB_URI` points to local Docker Mongo:
-
-```dotenv
-MONGODB_URI=mongodb://localhost:27017/uti_bunna_matches
-```
-
-4. Start only MongoDB with compose:
-
-```bash
-docker compose -f docker-compose.mongo.yml up -d
-```
-
-5. Start backend:
-
-```bash
+npm install
 npm start
 ```
 
-The project does not require committed `node_modules`.
-`package-lock.json` + `npm ci` ensure all users install the same dependency tree.
+## Base URL
 
-## Docker Compose (MongoDB Only)
+Replace the base URL with your deployed backend domain when testing from Postman or cURL.
 
-A dedicated compose file was added to run only MongoDB:
+Examples:
 
-- File: `backend/docker-compose.mongo.yml`
-
-Start MongoDB:
-
-```bash
-docker compose -f docker-compose.mongo.yml up -d
+```text
+http://localhost:3000
+https://your-backend-domain.com
 ```
 
-Stop MongoDB:
+## Endpoints
 
-```bash
-docker compose -f docker-compose.mongo.yml down
+### 1) Accept Passenger Match
+
+`POST /api/matches/:passengerId/accept`
+
+Use this endpoint when an authenticated driver accepts a passenger.
+
+Auth requirements:
+
+- `Authorization: Bearer <driver_token>`
+- The authenticated user must have role `driver`
+
+Path parameter:
+
+- `passengerId`: passenger user ID from PostgreSQL
+
+Request body:
+
+```json
+{}
 ```
 
-Stop and remove volume data:
+Note:
 
-```bash
-docker compose -f docker-compose.mongo.yml down -v
-```
-
-## API Endpoints
-
-## POST `/api/matches/:passengerId/accept`
-
-Accept a passenger by the authenticated driver and store the match in MongoDB.
-
-Middlewares:
-
-- `authMiddleware` — validates JWT and injects `req.user.id` (the driver's id)
-- `driverMiddleware` — ensures the authenticated user has the `driver` role
-
-Request params:
-
-- `passengerId` (string) — the `user_id` of the passenger to accept
-
-Request body: **none required**
-
-The driver's `full_name` and `phone` are resolved automatically from PostgreSQL using the authenticated driver's id. Nothing needs to be sent in the body.
-
-Example request (Postman):
-
-- Method: `POST`
-- URL: `{{BASE_URL}}/api/matches/:passengerId/accept`
-- Authorization tab → **Bearer Token** → paste the JWT obtained from login
-- Body: empty
+- This endpoint does not currently require any body fields.
+- Driver data is taken from the authenticated user in PostgreSQL.
 
 Success response: `200 OK`
-
-- Returns this payload:
 
 ```json
 {
   "ok": true,
   "data": {
-    "user_id": "5",
+    "_id": "69b2080d8a9106fa9c014acb",
+    "user_id": 103,
     "matches": [
       {
-        "driver_id": 2,
+        "driver_id": 104,
         "full_name": "Driver Name",
         "phone": "+573001112233",
-        "matched_at": "2026-03-12T10:00:00.000Z"
+        "matched_at": "2026-03-11T20:00:00.000Z"
       }
     ]
   },
@@ -130,52 +114,77 @@ Success response: `200 OK`
 }
 ```
 
-Possible business errors:
+Auth errors:
 
-- `Driver not found`
-- `Passenger not found`
-- `Selected user is not a passenger`
+`401 Unauthorized`
 
-Duplicate prevention:
-
-- The repository uses this condition to avoid adding the same driver twice for the same passenger:
-
-```javascript
+```json
 {
-  user_id: passengerId,
-  "matches.driver_id": { $ne: driverData.driver_id }
+  "error": "No token provided"
 }
 ```
 
-This means the update only pushes a new match when that `driver_id` is not already in `matches`.
+```json
+{
+  "error": "Invalid token"
+}
+```
 
-## GET `/api/matches/:passengerId`
+`403 Forbidden`
 
-Get all matches stored for a passenger.
+```json
+{
+  "error": "Access denied. Drivers only."
+}
+```
 
-Middlewares:
+Business errors:
 
-- `authMiddleware`
+`500 Internal Server Error`
 
-Request params:
+```json
+{
+  "success": false,
+  "message": "Passenger not found"
+}
+```
 
-- `passengerId` (string)
+Duplicate behavior:
+
+- The same driver is not added twice for the same passenger.
+- If the match already exists, the endpoint still returns the current Mongo document for that passenger.
+
+### 2) Get Authenticated Passenger Matches
+
+`GET /api/matches/me`
+
+Use this endpoint to read the matches of the authenticated passenger only.
+
+Auth requirements:
+
+- `Authorization: Bearer <passenger_token>`
+- Authenticated role must be `passenger`
+
+Security behavior:
+
+- The passenger ID is not taken from the URL.
+- The backend reads the ID directly from the JWT via `req.user.id`.
+- An authenticated user cannot replace a path parameter to read another passenger's matches.
 
 Success response: `200 OK`
-
-- Returns this payload:
 
 ```json
 {
   "ok": true,
   "data": {
-    "user_id": "5",
+    "_id": "69b2080d8a9106fa9c014acb",
+    "user_id": 103,
     "matches": [
       {
-        "driver_id": 2,
+        "driver_id": 104,
         "full_name": "Driver Name",
         "phone": "+573001112233",
-        "matched_at": "2026-03-12T10:00:00.000Z"
+        "matched_at": "2026-03-11T20:00:00.000Z"
       }
     ]
   },
@@ -193,56 +202,82 @@ Not found response: `404 Not Found`
 }
 ```
 
-Mongo route/middleware errors (for `/api/matches/*`) can return:
+Auth errors:
+
+`401 Unauthorized`
 
 ```json
 {
-  "success": false,
-  "message": "..."
+  "error": "No token provided"
 }
 ```
 
-## Files Added and Integrated
+```json
+{
+  "error": "Invalid token"
+}
+```
 
-MongoDB integration files:
+`403 Forbidden`
 
-- `src/config/mongodb.js`
-  - Connects using `MONGODB_URI` with the native `mongodb` package.
-  - Exposes `connectMongoDB()` and `getDb()`.
-  - Ensures Mongo index creation on startup.
+```json
+{
+  "ok": false,
+  "data": null,
+  "message": "Only passengers can view matches"
+}
+```
 
-- `src/models/match.model.js`
-  - Defines `MATCH_COLLECTION = "matches"`.
-  - Exposes `ensureMatchIndexes(db)` to create a unique index on `user_id`.
+## End-to-End Testing Flow
 
-- `src/repositories/match.mongo.repository.js`
-  - `addMatchToPassenger(passengerId, driverData)`.
-  - `getMatchesByPassenger(passengerId)`.
-  - Uses `updateOne` with `upsert: true` and duplicate prevention by `matches.driver_id`.
+Use this sequence in Postman or cURL.
 
-- `src/services/match.mongo.service.js`
-  - `acceptPassenger(driverId, passengerId)` — validates driver and passenger existence in PostgreSQL, checks passenger role, then calls the repository.
-  - `getPassengerMatches(passengerId)`.
+1. Register a passenger with `POST /api/auth/register`.
+2. Register a driver with `POST /api/auth/register`.
+3. Log in as the driver with `POST /api/auth/login` and copy the driver token.
+4. Log in as the passenger with `POST /api/auth/login` and copy the passenger token.
+5. Copy the passenger `user_id` from register or login data.
+6. Call `POST /api/matches/:passengerId/accept` using the driver token.
+7. Call `GET /api/matches/me` using the passenger token.
+8. Confirm the returned Mongo document contains the accepted driver inside `data.matches`.
 
-- `src/controllers/match.mongo.controller.js`
-  - `acceptPassenger` — reads `driverId` from `req.user.id` and `passengerId` from `req.params`. No body required.
-  - `getPassengerMatches` — reads `passengerId` from `req.params`.
-  - Handles request validation, success responses, and error forwarding.
+### Example cURL Flow
 
-- `src/routes/match.mongo.routes.js`
-  - `POST /:passengerId/accept`.
-  - `GET /:passengerId`.
-  - Applies `mongoNotFoundHandler` and `mongoErrorHandler` only for `/api/matches/*` routes.
+Accept a passenger as driver:
 
-- `src/middlewares/match.mongo.error.middleware.js`
-  - Handles match Mongo route errors with `{ success, message, details? }`.
+```bash
+curl -X POST https://your-backend-domain.com/api/matches/103/accept \
+  -H "Authorization: Bearer DRIVER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
 
-App wiring:
+Read the authenticated passenger matches:
 
-- `src/app.js`
-  - Registers `app.use("/api/matches", matchMongoRoutes)`.
-  - Calls `connectMongoDB()` at startup.
+```bash
+curl -X GET https://your-backend-domain.com/api/matches/me \
+  -H "Authorization: Bearer PASSENGER_TOKEN"
+```
 
-Dependency added:
+## How Data Is Saved Internally
 
-- `mongodb` in `package.json`.
+When you call `POST /api/matches/:passengerId/accept`:
+
+1. The JWT is validated.
+2. The backend verifies that the authenticated user is a driver.
+3. The driver is loaded from PostgreSQL.
+4. The passenger is loaded from PostgreSQL.
+5. MongoDB runs `updateOne(..., { upsert: true })` on the `matchForUser` collection.
+6. If the passenger document does not exist, it is created.
+7. A new object is appended to `matches`.
+8. If the same `driver_id` already exists, it is not duplicated.
+
+## Quick Troubleshooting
+
+- `MONGODB_URI is not defined`: your deployment is missing the Mongo connection string.
+- `No token provided`: the `Authorization` header is missing or not using `Bearer <token>` format.
+- `Invalid token`: the JWT is malformed, expired, or signed with a different `JWT_SECRET`.
+- `Access denied. Drivers only.`: you are trying to accept a passenger with a non-driver token.
+- `Only passengers can view matches`: you are calling `GET /api/matches/me` with a token that is not passenger.
+- `No matches found for this passenger`: that authenticated passenger still has no accepted matches stored in MongoDB.
+- `Passenger not found` or `Driver not found`: the relational user record does not exist in PostgreSQL.
