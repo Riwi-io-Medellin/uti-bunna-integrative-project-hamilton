@@ -14,4 +14,6 @@ export const sendResetEmail = async (to, token) => {
       <a href="${resetUrl}">Reset password</a>
     `
   })
+  console.log("calvito loco");
+  
 }
