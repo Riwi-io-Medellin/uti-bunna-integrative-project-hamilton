@@ -2,161 +2,95 @@
 
 ## Overview
 
-The password recovery flow allows users to reset their password via email. The process has two steps: sending a reset email with a secure JWT token, and using that token to set a new password. Tokens expire after 1 hour (JWT expiry).
+Updated flow requires authentication: users must be logged in (valid JWT auth token), provide their email in body, reset token (query), and new password. Ensures only account owner can reset password.
+
+Tokens expire after 1h (JWT expiry).
 
 ## Flow
 
-1. **Step 1**: User requests password reset → Email with reset link sent
-2. **Step 2**: User clicks link → Uses token to set new password
+1. **Login** → Get auth JWT token
+2. **Step 1**: Request reset email: `POST /api/auth/forgot-password` (body: email)
+3. **Step 2**: Use auth token + reset token from email + email + new password: `POST /api/security/reset-password?token=...`
 
 ## Endpoints
 
-### 1. Request Reset Email
+### 1. Request Reset Email **(now requires auth)**
 ```
 POST /api/auth/forgot-password
 ```
+**Headers**: `Authorization: Bearer <auth-token>`
+
+**Body**: `{ "email": "user@example.com" }`
+*(email verified against logged-in user)*
+
+### 2. Reset Password with Token + Auth
+```
+POST /api/security/reset-password?token=YOUR_RESET_TOKEN
+```
+
+**Headers**:
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | `Bearer YOUR_JWT_AUTH_TOKEN` | Yes |
 
 **Request Body**:
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| email | string | Yes | User email address |
-
-**Example Request**:
-```bash
-curl -X POST http://localhost:3000/api/auth/forgot-password \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com"
-  }'
-```
-
-**Success Response (200 OK)**:
-```json
-{
-  "message": "Password reset email sent. Check your inbox."
-}
-```
-
-**Note**: Always returns success even if email doesn't exist (security).
-
-### 2. Reset Password with Token
-```
-POST /api/security/reset-password?token=YOUR_TOKEN
-```
-
-**Headers**: None (token in query param)
-
-**Request Body**:
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
+| email | string | Yes | User's email (verified against auth user) |
 | password | string | Yes | New password (min 6 chars) |
 
-**Example Request**:
+**Example**:
 ```bash
 curl -X POST "http://localhost:3000/api/security/reset-password?token=eyJhbGciOiJIUzI1Ni..." \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1Ni...AUTH_TOKEN" \
   -d '{
+    "email": "user@example.com",
     "password": "newSecurePassword123"
   }'
 ```
 
-**Success Response (200 OK)**:
+**Success (200)**:
 ```json
 {
-  "message": "Password reset successfully"
+  "message": "Password updated successfully",
+  "user": { ... }
 }
 ```
 
-## Complete Example Flow
+## Security
 
-```bash
-# Step 1: Request reset email
-curl -X POST http://localhost:3000/api/auth/forgot-password \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com"}'
+- **Auth Token**: Verifies logged-in user owns reset token
+- **Reset Token**: Query param, type-checked, matches auth user ID
+- **Email**: Body param, verified belongs to user
+- Stateless JWTs
 
-# Check inbox for email containing link like:
-# http://localhost:3000/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+## Frontend Example
 
-# Step 2: Use token from email link to reset password
-curl -X POST "http://localhost:3000/api/security/reset-password?token=TOKEN_FROM_EMAIL" \
-  -H "Content-Type: application/json" \
-  -d '{"password": "newPassword123"}'
-```
-
-## Error Responses
-
-### Invalid Email Format (400)
-```json
-{
-  "errors": [{"instancePath": "/email", "message": "must match format \"email\""}]
-}
-```
-
-### Invalid/Expired Token (401)
-```json
-{
-  "error": "No reset token provided"
-}
-# or
-{
-  "error": "Invalid or expired reset token"
-}
-```
-
-### Wrong Token Type (401)
-```json
-{
-  "error": "Invalid token type"
-}
-```
-
-### Password Too Short (400)
-```json
-{
-  "errors": [{"instancePath": "/password", "message": "must be longer than or equal to 6 characters"}]
-}
-```
-
-## Frontend Integration
-
-**Reset Link Handling**:
 ```javascript
-// Parse token from URL params
-const urlParams = new URLSearchParams(window.location.search);
-const token = urlParams.get('token');
+// User logged in, has authToken from login
 
-if (token) {
-  // Show reset password form
-  document.getElementById('resetForm').style.display = 'block';
-}
-
-// Submit form
-fetch(`/api/security/reset-password?token=${token}`, {
+// Step 1: forgot password
+await fetch('/api/auth/forgot-password', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ password: newPassword })
+  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+  body: JSON.stringify({ email })
+});
+
+// Later, with resetToken from email
+await fetch(`/api/security/reset-password?token=${resetToken}`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${authToken}`
+  },
+  body: JSON.stringify({ email, password: newPassword })
 });
 ```
 
-## Email Template
+## Errors (examples)
 
-Emails contain:
-- Subject: "Password recovery"
-- Link: `http://localhost:3000/reset-password?token=xxx` (update to prod URL)
-- HTML styled with click link
-
-## Security Features
-
-1. **Stateless JWT Tokens**: Signed with `JWT_SECRET`, 1h expiry, type="password-reset" 
-2. **No Database Storage**: Stateless - no token table needed
-3. **No Leakage**: Forgot-password always "success" response (security)
-4. **Rate Limited**: Inherits express-rate-limit config
-5. **Validated**: Schema validation + JWT middleware
-
-## Production Notes
-
-1. Update `mailer.utils.js` resetUrl to production domain
-2. Configure proper CORS for frontend origin
-3. Monitor email delivery logs
-4. Use HTTPS for token links
+- No/missing auth: `{ "error": "No token provided" }` (401)
+- Invalid auth: `{ "error": "Invalid token" }` (401)
+- Reset token mismatch: `{ "error": "Reset token not for this user" }` (401)
+- Invalid email: `{ "error": "Invalid email" }` (400)

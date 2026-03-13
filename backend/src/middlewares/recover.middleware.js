@@ -12,11 +12,13 @@ export const recoverTokenMiddleware = (req, res, next) => {
     if (decoded.type !== "password-reset") {
       return res.status(401).json({ error: "Invalid token type" })
     }
-    req.user = { id: decoded.userId }
+    if (decoded.userId !== req.user.id) {
+      return res.status(401).json({ error: "Reset token not for this user" })
+    }
     next()
     
   } catch (error) {
-"Invalid or expired token"
+    return res.status(401).json({ error: "Invalid or expired token" })
   }
 }
 
