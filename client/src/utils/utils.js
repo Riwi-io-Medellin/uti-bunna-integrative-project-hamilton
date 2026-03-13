@@ -1,3 +1,7 @@
+import { loadGoogleMaps } from "./googleMapsLoader.js";
+import { initGoogleMap } from "../components/MapGoogle.js";
+
+
 export function isLoggedIn() {
   return localStorage.getItem("token") !== null;
 }
@@ -142,6 +146,10 @@ export async function getNaturalAddress(busqueda) {
 }
 
 
-export function useMapGoogle(){
-  
+const API_KEY = "AIzaSyB9fyTiP_gIDlIOlbzYxL2-Z8t7-wwYyFI";
+
+export async function startMap() {
+  await loadGoogleMaps(API_KEY);
+
+  initGoogleMap("map", 6.219186319336883, -75.5836256336475);
 }
