@@ -19,7 +19,7 @@ export function profileSettings(user) {
       <div class="flex flex-col items-center mt-7 mb-1">
         <div class="relative">
           <img
-            src="${user?.image || `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random()}`}"
+            src="${user?.image || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.full_name}`}"
             alt="Perfil"
             class="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white shadow-lg"
           />
