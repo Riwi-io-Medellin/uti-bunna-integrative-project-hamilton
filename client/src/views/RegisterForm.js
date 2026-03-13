@@ -3,6 +3,7 @@ import {
   getNaturalAddress,
   getMarkerPosition,
   updateMapPosition,
+  setSession,
 } from "../utils/utils.js";
 import Toastify from "toastify-js";
 
@@ -14,7 +15,7 @@ export function RegisterForm() {
         
         <div class="px-6 pt-8 pb-4">
             <div class="flex items-center justify-between mb-6">
-                <a href="/login" class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></a>
+                <a href="#/" class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></a>
                 <h1 class="text-lg font-bold text-gray-800">Registro</h1>
                 <div class="w-6"></div>
             </div>
@@ -223,9 +224,9 @@ export async function initRegisterForm() {
                 background: "#4f39f6",
               },
             }).showToast();
-            localStorage.setItem("token", JSON.stringify(json.token));
+            setSession(json.token, json.user);
             setTimeout(() => {
-              window.location = "#/home";
+              window.location = "#/";
             }, 1000);
             btnForm.disabled = false;
             btnForm.querySelector("div").classList.add("hidden");

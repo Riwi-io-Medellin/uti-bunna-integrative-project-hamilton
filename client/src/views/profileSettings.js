@@ -136,6 +136,6 @@ export function initProfileSettings() {
   });
 
   document.getElementById("backToMatches")?.addEventListener("click", () => {
-    location.hash = "#/matches";
+    location.hash = "#/";
   });
 }

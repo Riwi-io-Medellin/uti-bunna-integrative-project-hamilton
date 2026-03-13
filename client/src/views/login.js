@@ -116,7 +116,7 @@ export function initLoginView() {
         setSession(json.token, user);
 
         // Redirect to home
-        location.hash = "/home";
+        location.hash = "#/";
 
       } else {
         Toastify({
@@ -145,7 +145,7 @@ export function initLoginView() {
 
   document.getElementById("registerLink")?.addEventListener("click", (e) => {
     e.preventDefault();
-    location.hash = "/register";
+    location.hash = "#/register";
   });
 
   document.getElementById("togglePassBtn")?.addEventListener("click", () => {
