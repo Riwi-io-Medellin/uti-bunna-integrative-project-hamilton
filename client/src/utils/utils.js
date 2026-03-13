@@ -8,7 +8,13 @@ export function setSession(token, user) {
 }
 
 export function clearSession() {
-  localStorage.clear();
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+}
+
+export function getUser() {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
 }
 
 //Map functions

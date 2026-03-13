@@ -2,10 +2,13 @@ import { render } from "../core/render.js";
 import { landingPage } from "../views/landingPages.js";
 import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
-import { HomeView, initHomeView } from "../views/home.js";
-import { isLoggedIn } from "../utils/utils.js";
+/*import { HomeView, initHomeView } from "../views/home.js";*/
+import { isLoggedIn, getUser } from "../utils/utils.js";
 import { initMatchesView, MatchesView } from "../views/MatchesView.js";
-import { profileSettings } from "../views/profileSettings.js";
+import {
+  initProfileSettings,
+  profileSettings,
+} from "../views/profileSettings.js";
 
 export async function router() {
   const hash = location.hash || "#/landingPage";
@@ -14,10 +17,10 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["home", "myroute", "matches"];
+  const privateRoutes = ["myroute", "matches", "profileSettings"];
 
   if (isLoggedIn() && publicRoutes.includes(route)) {
-    location.hash = "#/home";
+    location.hash = "#/matches";
     return;
   }
 
@@ -30,10 +33,12 @@ export async function router() {
     landingPage: { view: landingPage },
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
-    home: { view: HomeView, init: initHomeView },
     matches: { view: MatchesView, init: initMatchesView },
     myroute: { view: () => "<p>my route</p><a href='#/matches'>myroute</a>" },
-    profileSettings: { view: profileSettings },
+    profileSettings: {
+      view: () => profileSettings(getUser()),
+      init: initProfileSettings,
+    },
   };
 
   const routeConfig = routes[route];

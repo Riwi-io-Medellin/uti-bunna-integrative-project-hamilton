@@ -4,8 +4,8 @@ export function landingPage() {
   <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <div class="w-16 h-16 rounded-lg flex items-center justify-center overflow-hidden">
+          <img src="./src/assets/utibunna-icon-transparent.png" alt="Logo" class="w-full h-full object-contain">
         </div>
         <span class="font-bold text-xl tracking-tight text-gray-900">Uti Bunna</span>
       </div>
