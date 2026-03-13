@@ -18,7 +18,7 @@ export const acceptPassenger = async (req, res, next) => {
 }
 
 export const getPassengerMatches = async (req, res, next) => {
-  const passengerId = req.params.passengerId
+  const passengerId = req.user.id
 
   try {
     const matchDocument = await matchMongoService.getPassengerMatches(passengerId)

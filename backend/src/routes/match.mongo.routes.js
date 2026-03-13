@@ -14,7 +14,7 @@ router.post(
 )
 
 router.get(
-  "/:passengerId",
+  "/me",
   authMiddleware,
   matchMongoController.getPassengerMatches
 )
