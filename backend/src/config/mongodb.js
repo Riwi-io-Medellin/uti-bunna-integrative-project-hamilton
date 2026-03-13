@@ -1,15 +1,13 @@
-import { MongoClient } from "mongodb"
+import mongoose from "mongoose"
 import { config } from "dotenv"
-import { ensureMatchIndexes } from "../models/match.model.js"
 
 config()
 
-let client = null
-let database = null
+let isConnected = false
 
 export const connectMongoDB = async () => {
-  if (database) {
-    return database
+  if (isConnected) {
+    return
   }
 
   const uri = process.env.MONGODB_URI
@@ -18,19 +16,19 @@ export const connectMongoDB = async () => {
     throw new Error("MONGODB_URI is not defined")
   }
 
-  client = new MongoClient(uri)
-  await client.connect()
-  const dbName = process.env.MONGODB_DB_NAME || "matchForUser"
-  database = client.db(dbName)
-  await ensureMatchIndexes(database)
+  await mongoose.connect(uri, {
+    dbName: process.env.MONGODB_DB_NAME || "matchForUser",
+  })
 
-  return database
+  isConnected = true
+  console.log("MongoDB connected via Mongoose")
 }
 
+// getDb() is no longer needed - Mongoose manages the connection internally.
+// It is kept as a no-op export so that if any file still imports it,
+// it won't crash. Remove once confirmed nothing imports it.
 export const getDb = () => {
-  if (!database) {
-    throw new Error("MongoDB is not connected")
-  }
-
-  return database
+  throw new Error(
+    "getDb() is deprecated after Mongoose migration. Use MatchModel directly."
+  )
 }
