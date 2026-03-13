@@ -40,13 +40,13 @@ export async function MatchesView() {
             </div>
             <a href="#/myroute" class="flex flex-col items-center text-gray-400">
                 <i class="fas fa-map-signs text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">ROUTE</span>
+                <span class="text-[10px] font-bold mt-1">RUTA</span>
             </a>
             
-            <div class="flex flex-col items-center text-gray-400">
+            <a href="#/profileSettings" class="flex flex-col items-center text-gray-400">
                 <i class="far fa-user text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">PROFILE</span>
-            </div>
+                <span class="text-[10px] font-bold mt-1">PERFIL</span>
+            </a>
         </nav>
 
     </div>

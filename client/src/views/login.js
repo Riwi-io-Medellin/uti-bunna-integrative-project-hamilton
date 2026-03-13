@@ -105,11 +105,19 @@ export function initLoginView() {
       const json = await res.json();
 
       if (res.ok) {
-        // Save tokens in localStorage
-        localStorage.setItem("token", json.token);
-        setSession(json.token, json.user);
+
+        // 🔹 Transform user to include name
+        const user = {
+          ...json.user,
+          name: json.user.full_name
+        };
+
+        // Save session
+        setSession(json.token, user);
+
         // Redirect to home
-        location.hash = "/home";
+        location.hash = "#/";
+
       } else {
         Toastify({
           text: json.message,
@@ -137,7 +145,7 @@ export function initLoginView() {
 
   document.getElementById("registerLink")?.addEventListener("click", (e) => {
     e.preventDefault();
-    location.hash = "/register";
+    location.hash = "#/register";
   });
 
   document.getElementById("togglePassBtn")?.addEventListener("click", () => {

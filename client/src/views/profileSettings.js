@@ -1,10 +1,12 @@
+import { clearSession } from "../utils/utils.js";
+
 export function profileSettings(user) {
   return `
     <div class="max-w-sm mx-auto bg-white min-h-screen font-sans pb-10" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
 
       <!-- Header -->
       <div class="flex items-center px-5 pt-6 pb-3 border-b border-gray-100">
-        <button class="text-indigo-500 hover:text-indigo-700 transition-colors p-1 -ml-1">
+        <button id="backToMatches" class="text-indigo-500 hover:text-indigo-700 transition-colors p-1 -ml-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
           </svg>
@@ -22,22 +24,17 @@ export function profileSettings(user) {
             class="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white shadow-lg"
           />
         </div>
-        <h2 class="mt-3 text-[17px] font-bold text-gray-900">${user?.name || "Uti Bunna"}</h2>
+        <h2 class="mt-3 text-[17px] font-bold text-gray-900">${user?.full_name || ""}</h2>
       </div>
 
       <!-- Role Toggle -->
       <div class="px-5 mt-5">
         <div class="flex bg-[#f0f1f8] rounded-2xl p-1 gap-1">
           <button
-            class="flex-1 py-[10px] rounded-xl text-[13px] font-semibold transition-all duration-200
-              ${
-                user?.role === "Driver"
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-400 hover:text-gray-600"
-              }"
+            class="flex-1 py-[10px] rounded-xl text-[13px] font-semibold transition-all duration-200"
           >
-            Pasajero
-          </button>
+            ${user?.role === "driver" ? "Conductor" : "Pasajero"}         
+           </button>
         </div>
       </div>
 
@@ -53,7 +50,7 @@ export function profileSettings(user) {
             </svg>
             <input
               type="text"
-              value="${user?.name || "Uti Bunna"}"
+              value="${user?.full_name}"
               class="bg-transparent text-[13px] text-gray-700 outline-none w-full placeholder-gray-400"
             />
           </div>
@@ -68,7 +65,7 @@ export function profileSettings(user) {
             </svg>
             <input
               type="email"
-              value="${user?.email || "uti.bunna@ride.com"}"
+              value="${user?.email}"
               class="bg-transparent text-[13px] text-gray-700 outline-none w-full placeholder-gray-400"
             />
           </div>
@@ -83,7 +80,7 @@ export function profileSettings(user) {
             </svg>
             <input
               type="tel"
-              value="${user?.phone || "+1 (415) 555-0123"}"
+              value="${user?.phone}"
               class="bg-transparent text-[13px] text-gray-700 outline-none w-full placeholder-gray-400"
             />
           </div>
@@ -100,14 +97,14 @@ export function profileSettings(user) {
               style="border:0; filter: saturate(0.9) brightness(1.02);"
               loading="lazy"
               allowfullscreen
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019!2d-122.3975!3d37.7915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085807c0f0f0f0f%3A0x0!2s123+Market+St%2C+San+Francisco%2C+CA!5e0!3m2!1sen!2sus!4v1234567890"
-            ></iframe>
+              src="https://www.google.com/maps?q=${encodeURIComponent((user?.address || "") + " Medellin, Colombia")}&z=16&output=embed">
+            </iframe>
 
             <div class="absolute bottom-2.5 left-2.5 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 shadow-md flex items-center gap-1.5 max-w-[85%]">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
               </svg>
-              <span class="text-[11px] text-gray-600 font-medium truncate">${user?.location || "123 Market St, San Francisco, CA"}</span>
+              <span class="text-[11px] text-gray-600 font-medium truncate">${user?.address}</span>
             </div>
           </div>
         </div>
@@ -123,11 +120,22 @@ export function profileSettings(user) {
 
       <!-- Log Out Button -->
       <div class="px-5 mt-3">
-        <button class="w-full bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-semibold py-[15px] rounded-2xl border border-gray-200 transition-all duration-200 text-[14px] tracking-wide">
+        <button id="logoutBtn" class="w-full bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-semibold py-[15px] rounded-2xl border border-gray-200 transition-all duration-200 text-[14px] tracking-wide">
           Cerrar Sesión
         </button>
       </div>
 
     </div>
   `;
+}
+
+export function initProfileSettings() {
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    clearSession();
+    location.hash = "#/landingPage";
+  });
+
+  document.getElementById("backToMatches")?.addEventListener("click", () => {
+    location.hash = "#/";
+  });
 }

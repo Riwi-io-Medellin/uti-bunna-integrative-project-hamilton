@@ -18,9 +18,9 @@ export async function ContactAttemps(params) {
                     <h1 class="text-gray-800 font-bold text-lg leading-tight">${user.full_name}</h1>
                 </div>
             </div>
-            <button class="border border-indigo-100 px-4 py-1.5 rounded-full flex items-center gap-2 text-indigo-500 text-xs font-semibold shadow-sm">
+            <a href="#/profileSettings" class="border border-indigo-100 px-4 py-1.5 rounded-full flex items-center gap-2 text-indigo-500 text-xs font-semibold shadow-sm">
                 <i class="fa-regular fa-eye"></i> Ver perfil
-            </button>
+            </a>
         </header>
 
         <section class="px-6 py-2">
@@ -62,14 +62,14 @@ export async function ContactAttemps(params) {
         </section>
 
         <nav class="border-t border-gray-100 flex justify-around py-4 bg-white">
-            <button class="flex flex-col items-center gap-1 text-indigo-600">
+            <a href="#/" class="flex flex-col items-center gap-1 text-indigo-600">
                 <i class="fa-solid fa-house text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
-            </button>
-            <button class="flex flex-col items-center gap-1 text-gray-400">
+            </a>
+            <a href="#/profileSettings" class="flex flex-col items-center gap-1 text-gray-400">
                 <i class="fa-regular fa-user text-xl"></i>
-                <span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
-            </button>
+                <span class="text-[10px] font-bold uppercase tracking-widest">PERFIL</span>
+            </a>
         </nav>
 
     </div>
@@ -94,7 +94,7 @@ export async function initContactAttempsView() {
     const contactAttempsList = document.getElementById("contact-attemps-list");
     const totalDrivers = document.getElementById("total-drivers");
     //if total is 0
-    totalDrivers.innerHTML = data.total > 0 ? data.total + " Conductores" : "No hay conductores";
+    totalDrivers.innerHTML = data.data.matches.length > 0 ? data.data.matches.length + " Conductores" : "No hay conductores";
     //if response is 200
     if(response.status === 200){
         contactAttempsList.innerHTML = ListMatches(data.data.matches);
