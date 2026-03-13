@@ -83,7 +83,7 @@ export async function initContactAttempsView() {
  const {user_id} = JSON.parse(localStorage.getItem('user'))
 
  
-    const response = await fetch(`https://uti-bunna-integrative-project-hamilton.onrender.com/api/matches/${user_id}`, {
+    const response = await fetch(`https://uti-bunna-integrative-project-hamilton.onrender.com/api/matches/me`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export async function initContactAttempsView() {
     const contactAttempsList = document.getElementById("contact-attemps-list");
     const totalDrivers = document.getElementById("total-drivers");
     //if total is 0
-    totalDrivers.innerHTML = data.data.matches.length > 0 ? data.data.matches.length + " Conductores" : "No hay conductores";
+    totalDrivers.innerHTML = data?.data?.matches.length > 0 ? data?.data?.matches.length + " Conductores" : "No hay conductores";
     //if response is 200
     if(response.status === 200){
         contactAttempsList.innerHTML = ListMatches(data.data.matches);
