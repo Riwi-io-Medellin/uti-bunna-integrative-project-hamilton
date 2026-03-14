@@ -1,6 +1,3 @@
-// user.service.js
-// Business logic for user profile updates.
-// Handles password verification, hashing, and delegation to the repository.
 
 import * as userRepository from "../repositories/user.repository.js"
 import { hashPassword, verifyPassword } from "../utils/hash.js"
