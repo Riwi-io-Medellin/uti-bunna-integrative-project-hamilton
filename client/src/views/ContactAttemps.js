@@ -1,6 +1,6 @@
-import ListMatches from "../components/Driver/ListMatches";
-import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches";
-import { Header } from "../components/Header";
+import ListMatches from "../components/Driver/ListMatches.js";
+import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js";
+import { Header } from "../components/Header.js";
 
 export async function ContactAttemps(params) {
     return `
