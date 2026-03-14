@@ -146,7 +146,7 @@ export async function getNaturalAddress(busqueda) {
 }
 
 
-const API_KEY = "AIzaSyB9fyTiP_gIDlIOlbzYxL2-Z8t7-wwYyFI";
+const API_KEY = "[ENCRYPTION_KEY]";
 
 export async function startMap() {
   await loadGoogleMaps(API_KEY);
