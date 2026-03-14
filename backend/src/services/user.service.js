@@ -54,3 +54,20 @@ export const updateProfile = async (userId, body) => {
 
   return { user: safeUser }
 }
+
+//recover
+
+export const recoverPassword = async (userId, newPassword) => {
+  const user = await userRepository.findUserById(userId)
+  
+  if (user.rowCount === 0) {
+    throw new Error("User not found")
+  }
+
+
+  const hashedPassword = await hashPassword(newPassword)
+  const result = await userRepository.updatePassword(userId, hashedPassword)
+
+  return result.rows[0]
+}
+//---

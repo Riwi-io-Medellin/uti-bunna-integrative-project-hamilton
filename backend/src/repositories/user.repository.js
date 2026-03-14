@@ -42,6 +42,23 @@ export const findUserById = async (userId) => {
   return pool.query(query, [userId])
 }
 
+//recover
+export const updatePassword = async (userId, passwordHash) => {
+
+  const query = `
+    UPDATE users
+    SET password_hash = $2
+    WHERE user_id = $1
+    RETURNING user_id, email
+  `
+
+  return pool.query(query, [userId, passwordHash])
+}
+
+
+//--
+
+
 // Fetches the full user row including password_hash.
 // Used by the profile-update service to verify the current password.
 export const findUserWithPasswordById = async (userId) => {
