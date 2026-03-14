@@ -3,14 +3,14 @@ import { landingPage } from "../views/landingPages.js";
 import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
 /*import { HomeView, initHomeView } from "../views/home.js";*/
-import { isLoggedIn, getUser, startMap } from "../utils/utils.js";
+import { isLoggedIn, getUser } from "../utils/utils.js";
 import { initMatchesView, MatchesView } from "../views/MatchesView.js";
 import {
   initProfileSettings,
   profileSettings,
 } from "../views/profileSettings.js";
 import { ContactAttemps, initContactAttempsView } from "../views/ContactAttemps.js";
-import { views } from "../views/views.js";
+import { initPassengersNearbyView, PassengersNearby } from "../views/PassengersNearby.js";
 
 export async function router() {
   const hash = location.hash || "#/landingPage";
@@ -57,7 +57,7 @@ export async function router() {
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     matches: { view: MatchesView, init: initMatchesView },
-    myroute: { view: views, init: startMap },
+    myroute: { view: PassengersNearby, init: initPassengersNearbyView },
     profileSettings: {
       view: () => profileSettings(getUser()),
       init: initProfileSettings,

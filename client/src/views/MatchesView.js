@@ -1,9 +1,10 @@
 import ListMatches from "../components/Driver/ListMatches.js";
 import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js";
 import { Header } from "../components/Header.js";
+import { getMatches } from "../services/usersServices.js";
 
 export async function MatchesView() {
-   
+
     return `
     <div class="bg-gray-50 font-sans flex justify-center">
 
@@ -46,15 +47,7 @@ export async function MatchesView() {
 }
 
 export async function initMatchesView() {
- const token = localStorage.getItem('token')
-    const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    const data = await response.json();
+    const data = await getMatches();
     const matchesList = document.getElementById("matches-list");
     const totalPassengers = document.getElementById("total-passengers");
     totalPassengers.innerHTML = data.total + " Passengers Nearby";

@@ -1,5 +1,5 @@
 import { loadGoogleMaps } from "./googleMapsLoader.js";
-import { initGoogleMap } from "../components/MapGoogle.js";
+import { drawMultipleMarkers, initGoogleMap } from "../components/MapGoogle.js";
 
 
 export function isLoggedIn() {
@@ -145,11 +145,3 @@ export async function getNaturalAddress(busqueda) {
   }
 }
 
-
-const API_KEY_TEST = "";
-
-export async function startMap() {
-  await loadGoogleMaps(API_KEY_TEST);
-
-  initGoogleMap("map", 6.219186319336883, -75.5836256336475);
-}
