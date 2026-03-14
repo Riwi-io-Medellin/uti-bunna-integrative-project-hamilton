@@ -46,7 +46,7 @@ export function initGoogleMapRegister(containerId, lat, lng) {
     position,
     map,
     icon: {
-      url: "./src/assets/marker_riwi.ico",
+      url: markerRiwiIcon,
       scaledSize: new google.maps.Size(50, 50) // tamaño del icono
     }
   });
