@@ -7,6 +7,7 @@ import matchMongoRoutes from "./routes/match.mongo.routes.js"
 import userRoutes from "./routes/user.routes.js"
 import { connectMongoDB } from "./config/mongodb.js"
 import { errorHandler } from "./middlewares/error.middleware.js"
+import recoverRoutes from "./routes/recoverPassword.routes.js"
 
 const app = express()
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/drivers", matchRoutes)
 app.use("/api/matches", matchMongoRoutes)
 app.use("/api/users", userRoutes)
+app.use("/api/security", recoverRoutes)
 
 const initializeMongoDB = async () => {
 	try {
