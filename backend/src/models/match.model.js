@@ -1,8 +1,5 @@
-export const MATCH_COLLECTION = "matchForUser"
+import mongoose from "mongoose"
+import { matchSchema } from "../schemas/match.schema.js"
 
-export const ensureMatchIndexes = async (db) => {
-  await db.collection(MATCH_COLLECTION).createIndex(
-    { user_id: 1 },
-    { unique: true }
-  )
-}
+// Collection name stays the same: "matchForUser"
+export const MatchModel = mongoose.model("matchForUser", matchSchema)
