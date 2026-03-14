@@ -1,5 +1,5 @@
-export function MapGoogle(){
-    return `
+export function MapGoogle() {
+  return `
     <div id="map" style="height: 500px; width: 100%;"></div>
     `
 }
@@ -13,17 +13,21 @@ export function initGoogleMap(containerId, lat, lng) {
   map = new google.maps.Map(document.getElementById(containerId), {
     center: position,
     zoom: 15,
+    disableDefaultUI: true
   });
 
   marker = new google.maps.Marker({
     position,
     map,
-    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+    icon: {
+      url: "./src/assets/marker_riwi.ico",
+      scaledSize: new google.maps.Size(50, 50) // tamaño del icono
+    }
   });
 
-/*   map.addListener("click", (e) => {
-    marker.setPosition(e.latLng);
-  }); */
+  /*   map.addListener("click", (e) => {
+      marker.setPosition(e.latLng);
+    }); */
 
   return map;
 }
@@ -50,47 +54,99 @@ export function updateMapPosition(lat, lng) {
 
 let markersList = [];
 export function drawMultipleMarkers(locations) {
-  // Limpiar marcadores anteriores si se vuelve a llamar la función
   markersList.forEach(m => m.setMap(null));
   markersList = [];
-  
+  const driverPosition = { lat: JSON.parse(locations.driverRoute).coordinates[0][1], lng: JSON.parse(locations.driverRoute).coordinates[0][0] };
+  locations = locations.matches;
 
-  // Comprobar que el mapa ya esté inicializado
+
+  marker = new google.maps.Marker({
+    position: driverPosition,
+    map,
+    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+  });
+
   if (!map) {
-      console.error("El mapa aún no ha sido inicializado");
-      return;
+    console.error("El mapa aún no ha sido inicializado");
+    return;
   }
 
-// Iterar sobre la lista de ubicaciones
- locations.forEach(location => {
+  const bounds = new google.maps.LatLngBounds();
 
-  const marker = new google.maps.Marker({
-    position: {
+  locations.forEach(location => {
+
+    const position = {
       lat: JSON.parse(location.location).coordinates[1],
       lng: JSON.parse(location.location).coordinates[0]
-    },
-    map: map,
-    title: location.title || "Ubicación",
-    icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-  });
+    };
 
-  const infoWindow = new google.maps.InfoWindow({
-    content: `
-      <div style="width:200px">
-        <h3>Juan Esteban</h3>
-        <p>📍 Calle 123</p>
-        <p>📞 123456789</p>
-        <button onclick="alert('Contactar')">
-          Contactar
-        </button>
+    const marker = new google.maps.Marker({
+      position,
+      map: map,
+      title: location.title || "Ubicación",
+      icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+    });
+
+    bounds.extend(position); // agregar marker al bounds
+
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const isDriver = user.role === 'driver';
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+      <div class="w-[200px]">
+        <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${location.full_name}" class="w-12 h-12 rounded-full" />
+        <h3>${location.full_name}</h3>
+        <p>📍 ${location.address}</p>
+
+        <div class="flex justify-center mt-2">
+          <a href="https://wa.me/57${location.phone}" 
+             target="_blank"
+             data-is-driver="${isDriver}" 
+             data-match-id="${location.user_id}" 
+             class="whatsapp-match-btn w-[50%] bg-green-500 text-white py-2 rounded-xl flex justify-center items-center gap-2 text-sm font-bold">
+             <i class="fab fa-whatsapp"></i> WhatsApp
+          </a>
+        </div>
       </div>
-    `
+      `
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+
+    markersList.push(marker);
   });
 
-  marker.addListener("click", () => {
-    infoWindow.open(map, marker);
+  // Ajustar mapa para mostrar todos los markers
+  if (locations.length > 0) {
+    map.fitBounds(bounds);
+  }
+}
+export function drawRouteGeoJSON(geojson) {
+
+
+  if (!map) {
+    console.error("Map not initialized");
+    return;
+  }
+
+  // limpiar rutas anteriores
+  map.data.forEach(feature => {
+    map.data.remove(feature);
   });
 
-  markersList.push(marker);
-});
+  // agregar geojson
+  map.data.addGeoJson({
+    type: "Feature",
+    geometry: geojson
+  });
+
+  // estilo de la ruta
+  map.data.setStyle({
+    strokeColor: "#2563eb",
+    strokeWeight: 4
+  });
+
 }
