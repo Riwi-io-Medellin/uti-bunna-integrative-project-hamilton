@@ -19,9 +19,9 @@ export function PassengersNearby() {
    `;
 }
 
-const API_KEY_MAPS = "";
+
 export async function initPassengersNearbyView() {
-    await loadGoogleMaps(API_KEY_MAPS);
+    await loadGoogleMaps();
     initGoogleMap("map", 6.219186319336883, -75.5836256336475);
     const matches = await getMatches();
     const totalPassengers = document.getElementById("total-passengers");
