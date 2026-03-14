@@ -1,3 +1,4 @@
+import markerRiwiIcon from "../assets/marker_riwi.ico";
 export function MapGoogle() {
   return `
     <div id="map" style="height: 500px; width: 100%;"></div>
@@ -21,7 +22,7 @@ export function initGoogleMap(containerId, lat, lng) {
     position,
     map,
     icon: {
-      url: "./src/assets/marker_riwi.ico",
+      url: markerRiwiIcon,
       scaledSize: new google.maps.Size(50, 50) // tamaño del icono
     }
   });
