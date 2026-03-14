@@ -146,10 +146,10 @@ export async function getNaturalAddress(busqueda) {
 }
 
 
-const API_KEY = "AIzaSyB9fyTiP_gIDlIOlbzYxL2-Z8t7-wwYyFI";
+const API_KEY_TEST = "";
 
 export async function startMap() {
-  await loadGoogleMaps(API_KEY);
+  await loadGoogleMaps(API_KEY_TEST);
 
   initGoogleMap("map", 6.219186319336883, -75.5836256336475);
 }
