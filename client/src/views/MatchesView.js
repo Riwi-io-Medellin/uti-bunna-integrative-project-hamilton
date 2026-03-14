@@ -1,9 +1,11 @@
 import ListMatches from "../components/Driver/ListMatches.js";
+import { NavBar } from "../components/Driver/NavBar.js";
 import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js";
 import { Header } from "../components/Header.js";
+import { getMatches } from "../services/usersServices.js";
 
 export async function MatchesView() {
-   
+
     return `
     <div class="bg-gray-50 font-sans flex justify-center">
 
@@ -24,21 +26,7 @@ export async function MatchesView() {
             ${SkeletonListMatches()}
         </div>
 
-        <nav class="absolute bottom-0 w-full bg-white border-t border-gray-100 p-4 flex justify-between items-center px-8 shadow-2xl">
-            <div class="flex flex-col items-center text-blue-600">
-                <i class="fas fa-th-large text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">PASSANGERS NEARBY</span>
-            </div>
-            <a href="#/myroute" class="flex flex-col items-center text-gray-400">
-                <i class="fas fa-map-signs text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">RUTA</span>
-            </a>
-            
-            <a href="#/profileSettings" class="flex flex-col items-center text-gray-400">
-                <i class="far fa-user text-xl"></i>
-                <span class="text-[10px] font-bold mt-1">PERFIL</span>
-            </a>
-        </nav>
+        ${NavBar()}
 
     </div>
 </div>
@@ -46,15 +34,7 @@ export async function MatchesView() {
 }
 
 export async function initMatchesView() {
- const token = localStorage.getItem('token')
-    const response = await fetch("https://uti-bunna-integrative-project-hamilton.onrender.com/api/drivers/matches", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    const data = await response.json();
+    const data = await getMatches();
     const matchesList = document.getElementById("matches-list");
     const totalPassengers = document.getElementById("total-passengers");
     totalPassengers.innerHTML = data.total + " Passengers Nearby";

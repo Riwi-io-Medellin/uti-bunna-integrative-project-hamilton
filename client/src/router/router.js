@@ -10,6 +10,7 @@ import {
   profileSettings,
 } from "../views/profileSettings.js";
 import { ContactAttemps, initContactAttempsView } from "../views/ContactAttemps.js";
+import { initPassengersNearbyView, PassengersNearby } from "../views/PassengersNearby.js";
 
 export async function router() {
   const hash = location.hash || "#/landingPage";
@@ -56,7 +57,7 @@ export async function router() {
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     matches: { view: MatchesView, init: initMatchesView },
-    myroute: { view: () => "<p>my route</p><a href='#/matches'>myroute</a>" },
+    myroute: { view: PassengersNearby, init: initPassengersNearbyView },
     profileSettings: {
       view: () => profileSettings(getUser()),
       init: initProfileSettings,

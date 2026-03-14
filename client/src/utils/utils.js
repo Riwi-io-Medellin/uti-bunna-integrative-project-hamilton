@@ -1,3 +1,7 @@
+import { loadGoogleMaps } from "./googleMapsLoader.js";
+import { drawMultipleMarkers, initGoogleMap } from "../components/MapGoogle.js";
+
+
 export function isLoggedIn() {
   return localStorage.getItem("token") !== null;
 }
@@ -140,3 +144,4 @@ export async function getNaturalAddress(busqueda) {
     return null; // para manejar errores
   }
 }
+
