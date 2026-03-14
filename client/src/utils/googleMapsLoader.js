@@ -1,8 +1,8 @@
 let googleMapsPromise = null;
 
 export function loadGoogleMaps() {
-  //const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-  const apiKey = "";
+  const apiKey = import.meta.env.VITE_API_KEY_MAPS;
+  //const apiKey = "";
   if (googleMapsPromise) return googleMapsPromise;
 
   googleMapsPromise = new Promise((resolve, reject) => {

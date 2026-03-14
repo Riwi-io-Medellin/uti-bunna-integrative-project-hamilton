@@ -1,5 +1,5 @@
 import { NavBar } from "../components/Driver/NavBar.js";
-import { drawMultipleMarkers, drawRouteGeoJSON, initGoogleMap } from "../components/MapGoogle.js";
+import { drawMultipleMarkers, drawRouteGeoJSON, initGoogleMap, initGoogleMapRegister } from "../components/MapGoogle.js";
 import { getMatches } from "../services/usersServices.js";
 import { loadGoogleMaps } from "../utils/googleMapsLoader.js";
 
@@ -58,3 +58,9 @@ document.addEventListener('click', async (e) => {
     }
 
 });
+
+export async function initRegisterMapForm() {
+    await loadGoogleMaps();
+    
+    initGoogleMapRegister("map", 6.219186319336883, -75.5836256336475);
+}
