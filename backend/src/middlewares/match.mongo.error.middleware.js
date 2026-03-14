@@ -11,6 +11,21 @@ export function mongoErrorHandler(error, req, res, next) {
     statusCode = 409
   }
 
+  // Mongoose duplicate key error (unique index violation)
+  if (error?.code === 11000) {
+    statusCode = 409
+  }
+
+  // Mongoose schema validation error
+  if (error?.name === "ValidationError") {
+    statusCode = 400
+  }
+
+  // Mongoose cast error (wrong type passed, e.g. string where Number expected)
+  if (error?.name === "CastError") {
+    statusCode = 400
+  }
+
   if (error?.name === "ValidationError") {
     statusCode = 400
   }
