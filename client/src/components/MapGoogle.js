@@ -6,6 +6,7 @@ export function MapGoogle() {
 
 let map;
 let marker;
+let markerRiwi;
 
 export function initGoogleMap(containerId, lat, lng) {
   const position = { lat, lng };
@@ -28,6 +29,36 @@ export function initGoogleMap(containerId, lat, lng) {
   /*   map.addListener("click", (e) => {
       marker.setPosition(e.latLng);
     }); */
+
+  return map;
+}
+export function initGoogleMapRegister(containerId, lat, lng) {
+  const position = { lat, lng };
+
+  map = new google.maps.Map(document.getElementById(containerId), {
+    center: position,
+    zoom: 15,
+    disableDefaultUI: true
+  });
+
+  markerRiwi = new google.maps.Marker({
+    position,
+    map,
+    icon: {
+      url: "./src/assets/marker_riwi.ico",
+      scaledSize: new google.maps.Size(50, 50) // tamaño del icono
+    }
+  });
+  marker = new google.maps.Marker({
+    position : null,
+    map,
+  });
+
+ //set marker position when click
+  map.addListener("click", (e) => {
+    marker.setPosition(e.latLng);    
+    console.log(getMarkerPosition());
+  });
 
   return map;
 }
@@ -54,6 +85,7 @@ export function updateMapPosition(lat, lng) {
 
 let markersList = [];
 export function drawMultipleMarkers(locations) {
+  //remove previous markers
   markersList.forEach(m => m.setMap(null));
   markersList = [];
   const driverPosition = { lat: JSON.parse(locations.driverRoute).coordinates[0][1], lng: JSON.parse(locations.driverRoute).coordinates[0][0] };
@@ -71,6 +103,7 @@ export function drawMultipleMarkers(locations) {
     return;
   }
 
+  //add bounds to map to fit all markers
   const bounds = new google.maps.LatLngBounds();
 
   locations.forEach(location => {
@@ -87,6 +120,7 @@ export function drawMultipleMarkers(locations) {
       icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
     });
 
+    //add marker to bounds
     bounds.extend(position); // agregar marker al bounds
 
     const user = JSON.parse(localStorage.getItem('user')) || {};
@@ -116,6 +150,7 @@ export function drawMultipleMarkers(locations) {
       infoWindow.open(map, marker);
     });
 
+  
     markersList.push(marker);
   });
 
