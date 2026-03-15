@@ -2,7 +2,6 @@ import { render } from "../core/render.js";
 import { landingPage } from "../views/landingPages.js";
 import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
-/*import { HomeView, initHomeView } from "../views/home.js";*/
 import { isLoggedIn, getUser } from "../utils/utils.js";
 import { initMatchesView, MatchesView } from "../views/MatchesView.js";
 import {
@@ -47,7 +46,7 @@ export async function router() {
 
     const driverOnlyRoutes = ["matches", "myroute"];
     if (role !== "driver" && driverOnlyRoutes.includes(route)) {
-      location.hash = "#/contact-attemps"; // Redirigir pasajeros a su ruta por defecto
+      location.hash = "#/contact-attemps"; // redirect passangers to their default route
       return;
     }
   }
@@ -75,6 +74,3 @@ export async function router() {
   render(await routeConfig.view());
   routeConfig.init?.();
 }
-
-/* To log out and return to the login page, open the console (F12) and run:
- * localStorage.removeItem('token') and refresh the page */
