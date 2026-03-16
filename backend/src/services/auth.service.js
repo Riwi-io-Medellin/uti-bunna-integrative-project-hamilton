@@ -52,8 +52,10 @@ export const register = async (userData) => {
      role: user.rows[0].role
   })
 
+
+  const { password_hash, ...safeUser } = user.rows[0]
   return {
-    user: user.rows[0],
+    user: safeUser,
     driver: driverData ? driverData.rows[0] : null,
     token
   }
@@ -79,8 +81,10 @@ export const login = async (credentials) => {
     role: user.rows[0].role
   })
 
+  const { password_hash, ...safeUser } = user.rows[0]
+
   return {
-    user: user.rows[0],
+    user: safeUser,
     token
   }
 }

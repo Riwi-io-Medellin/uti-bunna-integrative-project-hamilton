@@ -1,10 +1,11 @@
 import { initMap, Map } from "../components/Map.js";
 import {
   getNaturalAddress,
-  getMarkerPosition,
-  updateMapPosition,
+  setSession,
 } from "../utils/utils.js";
 import Toastify from "toastify-js";
+import { initRegisterMapForm } from "./PassengersNearby.js";
+import { updateMapPosition, getMarkerPosition } from "../components/MapGoogle.js";
 
 export function RegisterForm() {
   return `
@@ -14,7 +15,7 @@ export function RegisterForm() {
         
         <div class="px-6 pt-8 pb-4">
             <div class="flex items-center justify-between mb-6">
-                <a href="/login" class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></a>
+                <a href="#/" class="text-gray-700 text-lg"><i class="fa-solid fa-arrow-left"></i></a>
                 <h1 class="text-lg font-bold text-gray-800">Registro</h1>
                 <div class="w-6"></div>
             </div>
@@ -126,7 +127,7 @@ export function RegisterForm() {
             ${Map()}
 
         <div class="px-6 py-8">
-            <button type="sumbit" class="flex justify-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] mb-4">
+            <button type="submit" class="flex justify-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] mb-4">
                 <span>Crear cuenta</span>
                 <div class="hidden animate-spin rounded-full h-10 w-10 border-4 border-b-current border-gray-200"></div>
             </button>
@@ -144,200 +145,187 @@ export function RegisterForm() {
 }
 
 //function to init register form
+let selectedLocation = null;
 export async function initRegisterForm() {
-  initMap(); //init map
 
-  //variable to store selected location
-  let selectedLocation = null;
-  //variable to store timeout id
-  let timeoutId;
+  await initRegisterMapForm(); // ya carga Google Maps
 
-  document
-    .getElementById("registerForm")
-    ?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btnForm = e.target.querySelector("button");
-      const formData = new FormData(e.target);
+  let debounceTimer;
 
-      //validate password
-      if (validatePassword()) {
-        btnForm.disabled = true;
-        btnForm.querySelector("div").classList.remove("hidden");
-        btnForm.querySelector("span").classList.add("hidden");
+  // ✅ crear el servicio
+  const autocompleteService = new google.maps.places.AutocompleteService();
 
-        //always send the display_name of the original input or selectedLocation
-        if (selectedLocation) {
-          formData.append("address", selectedLocation.display_name);
-        } else {
-          formData.append("address", document.getElementById("location").value);
-        }
+  const input = document.getElementById("location");
+  const list = document.getElementById("location-list");
 
-        //delete the confirmation password
-        formData.delete("check-password");
-        //convert the FormData to a standard JavaScript object first
-        const data = Object.fromEntries(formData.entries());
-        //get the password and send it through the object
-        data.password = document.getElementById("password").value;
+  input.addEventListener("input", (e) => {
+    const value = e.target.value.trim();
 
-        //get the last current position of the marker (even if the user dragged it)
-        const currentMarkerPosition = getMarkerPosition();
-
-        if (currentMarkerPosition) {
-          // Asignamos el objeto directamente a "data" en lugar de "formData"
-          data.location = {
-            type: "Point",
-            coordinates: [currentMarkerPosition.lon, currentMarkerPosition.lat],
-          };
-        } else if (selectedLocation) {
-          // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
-          data.location = {
-            type: "Point",
-            coordinates: [selectedLocation.lon, selectedLocation.lat],
-          };
-        }
-
-        //send the data to the server
-        const res = await fetch(
-          "https://uti-bunna-integrative-project-hamilton.onrender.com/api/auth/register",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          },
-        );
-        //convert response to json
-        const json = await res.json();
-
-        //get message error
-        const message =
-          json?.errors?.[0]?.message || json?.message || "Unknown error";
-        //if response is ok
-        try {
-          if (res.ok) {
-            Toastify({
-              text: "User registered successfully",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              style: {
-                background: "#4f39f6",
-              },
-            }).showToast();
-            localStorage.setItem("token", JSON.stringify(json.token));
-            setTimeout(() => {
-              window.location = "#/home";
-            }, 1000);
-            btnForm.disabled = false;
-            btnForm.querySelector("div").classList.add("hidden");
-            btnForm.querySelector("span").classList.remove("hidden");
-          } else {
-            Toastify({
-              text: message,
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              style: {
-                background: "red",
-              },
-            }).showToast();
-          }
-        } catch (error) {
-          Toastify({
-            text: error,
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            style: { background: "red" },
-          }).showToast();
-        } finally {
-          btnForm.disabled = false;
-          btnForm.querySelector("div").classList.add("hidden");
-          btnForm.querySelector("span").classList.remove("hidden");
-        }
-      }
-    });
-  //add event listener to location input, when the user types something, it will show a list of suggestions
-  document.getElementById("location").addEventListener("input", async (e) => {
-    const inputValue = e.target.value.toLowerCase().trim();
-    const list = document.getElementById("location-list");
-
-    if (!inputValue || inputValue.length < 3) {
+    if (!value || value.length < 3) {
       list.innerHTML = "";
-      list.classList.remove(
-        "rounded-xl",
-        "border",
-        "mt-3",
-        "shadow-md",
-        "bg-white",
-      );
       return;
     }
 
-    let results = await getNaturalAddress(inputValue);
-    list.innerHTML = "";
+    clearTimeout(debounceTimer);
 
-    if (results && results.length > 0) {
-      list.classList.add(
-        "rounded-xl",
-        "border",
-        "border-gray-100",
-        "mt-3",
-        "shadow-md",
-        "bg-white",
-        "overflow-hidden",
-        "divide-y",
-        "divide-gray-50",
+    debounceTimer = setTimeout(() => {
+      autocompleteService.getPlacePredictions(
+        {
+          input: value,
+          componentRestrictions: { country: "co" }
+        },
+        (predictions, status) => {
+          if (status !== google.maps.places.PlacesServiceStatus.OK) return;
+          renderResults(predictions, list);
+        }
       );
+    }, 600);
+  });
 
-      results.forEach((item) => {
-        const li = document.createElement("li");
+  document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btnForm = e.target.querySelector('button[type="submit"]');
 
-        li.innerHTML = `
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-map-pin text-indigo-400 mt-1"></i>
-                            <span class="text-sm text-gray-700 leading-tight">${item.display_name}</span>
-                        </div>
-                    `;
+    const formData = new FormData(e.target);
 
-        li.classList.add(
-          "cursor-pointer",
-          "hover:bg-indigo-50",
-          "p-3",
-          "transition-colors",
-          "duration-150",
-        );
-        list.appendChild(li);
+    //validate password
+    if (validatePassword()) {
+      btnForm.disabled = true;
+      btnForm.querySelector("div").classList.remove("hidden");
+      btnForm.querySelector("span").classList.add("hidden");
 
-        li.addEventListener("click", () => {
-          selectedLocation = item;
-          list.innerHTML = "";
-          list.classList.remove(
-            "rounded-xl",
-            "border",
-            "border-gray-100",
-            "mt-3",
-            "shadow-md",
-            "bg-white",
-            "divide-y",
-            "divide-gray-50",
-          );
-          document.getElementById("location").value = item.display_name;
-          updateMapPosition(item.lat, item.lon);
-        });
-      });
-    } else {
-      list.classList.remove(
-        "rounded-xl",
-        "border",
-        "border-gray-100",
-        "mt-3",
-        "shadow-md",
-        "bg-white",
-        "divide-y",
-        "divide-gray-50",
+
+      //always send the display_name of the original input or selectedLocation
+      formData.append("address", document.getElementById("location").value);
+
+      //delete the confirmation password
+      formData.delete("check-password");
+      //convert the FormData to a standard JavaScript object first
+      const data = Object.fromEntries(formData.entries());
+      //get the password and send it through the object
+      data.password = document.getElementById("password").value;
+
+      //get the last current position of the marker (even if the user dragged it)
+      const currentMarkerPosition = getMarkerPosition();
+
+      if (currentMarkerPosition && currentMarkerPosition.lng !== undefined) {
+        // Asignamos el objeto directamente a "data" en lugar de "formData"
+        data.location = {
+          type: "Point",
+          coordinates: [currentMarkerPosition.lng, currentMarkerPosition.lat],
+        };
+      } else if (selectedLocation) {
+        // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
+        data.location = {
+          type: "Point",
+          coordinates: [selectedLocation.geometry.location.lng(), selectedLocation.geometry.location.lat()],
+        };
+      }
+      console.log("test");
+
+
+
+      //send the data to the server
+      const res = await fetch(
+        "https://uti-bunna-integrative-project-hamilton.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        },
       );
+      //convert response to json
+      const json = await res.json();
+
+      //get message error
+      const message =
+        json?.errors?.[0]?.message || json?.message || "Unknown error";
+      //if response is ok
+      try {
+        if (res.ok) {
+          Toastify({
+            text: "User registered successfully",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+              background: "#4f39f6",
+            },
+          }).showToast();
+          setSession(json.token, json.user);
+          setTimeout(() => {
+            window.location = "#/";
+          }, 1000);
+          btnForm.disabled = false;
+          btnForm.querySelector("div").classList.add("hidden");
+          btnForm.querySelector("span").classList.remove("hidden");
+        } else {
+          Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+              background: "red",
+            },
+          }).showToast();
+        }
+      } catch (error) {
+        Toastify({
+          text: error,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          style: { background: "red" },
+        }).showToast();
+      } finally {
+        btnForm.disabled = false;
+        btnForm.querySelector("div").classList.add("hidden");
+        btnForm.querySelector("span").classList.remove("hidden");
+      }
     }
   });
+}
+
+function renderResults(predictions, list) {
+  list.innerHTML = "";
+
+  predictions.forEach((place) => {
+    const li = document.createElement("li");
+    li.textContent = place.description;
+    li.className = "p-2 cursor-pointer hover:bg-gray-100";
+
+    li.addEventListener("click", () => {
+      selectPlace(place, list);
+    });
+
+    list.appendChild(li);
+  });
+
+
+
+  const placesService = new google.maps.places.PlacesService(document.createElement("div"));
+  function selectPlace(place) {
+    placesService.getDetails(
+      {
+        placeId: place.place_id,
+        fields: ["geometry", "formatted_address"]
+      },
+      (result, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) return;
+
+        const lat = result.geometry.location.lat();
+        const lng = result.geometry.location.lng();
+
+        updateMapPosition(lat, lng);
+        selectedLocation = result;
+
+        document.getElementById("location").value = result.formatted_address;
+        list.innerHTML = "";
+        return result.formatted_address;
+      }
+    );
+  }
 }
 
 function validatePassword() {

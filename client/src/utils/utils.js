@@ -1,3 +1,7 @@
+import { loadGoogleMaps } from "./googleMapsLoader.js";
+import { drawMultipleMarkers, initGoogleMap } from "../components/MapGoogle.js";
+
+
 export function isLoggedIn() {
   return localStorage.getItem("token") !== null;
 }
@@ -8,7 +12,13 @@ export function setSession(token, user) {
 }
 
 export function clearSession() {
-  localStorage.clear();
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+}
+
+export function getUser() {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
 }
 
 //Map functions
@@ -86,12 +96,30 @@ export function useMap() {
   return { lat, lng };
 }
 
-export function updateMapPosition(lat, lng) {
+/* export function updateMapPosition(lat, lng) {
   map.setView([lat, lng], 16);
   if (marker) {
     marker.setLatLng([lat, lng]);
   } else {
     marker = L.marker([lat, lng]).addTo(map);
+  }
+} */
+
+export function updateMapPosition(lat, lng) {
+  const position = { lat: Number(lat), lng: Number(lng) };
+
+  // mover el centro del mapa
+  map.setCenter(position);
+  map.setZoom(16);
+
+  // mover o crear marcador
+  if (marker) {
+    marker.setPosition(position);
+  } else {
+    marker = new google.maps.Marker({
+      position: position,
+      map: map
+    });
   }
 }
 
@@ -134,3 +162,4 @@ export async function getNaturalAddress(busqueda) {
     return null; // para manejar errores
   }
 }
+
