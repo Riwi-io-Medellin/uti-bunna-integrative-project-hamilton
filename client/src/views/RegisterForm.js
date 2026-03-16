@@ -1,12 +1,11 @@
 import { initMap, Map } from "../components/Map.js";
 import {
   getNaturalAddress,
-  getMarkerPosition,
   setSession,
 } from "../utils/utils.js";
 import Toastify from "toastify-js";
 import { initRegisterMapForm } from "./PassengersNearby.js";
-import { updateMapPosition } from "../components/MapGoogle.js";
+import { updateMapPosition, getMarkerPosition } from "../components/MapGoogle.js";
 
 export function RegisterForm() {
   return `
@@ -197,11 +196,7 @@ export async function initRegisterForm() {
 
 
       //always send the display_name of the original input or selectedLocation
-      if (selectedLocation) {
-        formData.append("address", selectedLocation.formatted_address);
-      } else {
-        formData.append("address", document.getElementById("location").value);
-      }
+      formData.append("address", document.getElementById("location").value);
 
       //delete the confirmation password
       formData.delete("check-password");
@@ -213,11 +208,11 @@ export async function initRegisterForm() {
       //get the last current position of the marker (even if the user dragged it)
       const currentMarkerPosition = getMarkerPosition();
 
-      if (currentMarkerPosition) {
+      if (currentMarkerPosition && currentMarkerPosition.lng !== undefined) {
         // Asignamos el objeto directamente a "data" en lugar de "formData"
         data.location = {
           type: "Point",
-          coordinates: [currentMarkerPosition.lon, currentMarkerPosition.lat],
+          coordinates: [currentMarkerPosition.lng, currentMarkerPosition.lat],
         };
       } else if (selectedLocation) {
         // Fallback por si acaso el marcador falló, usamos lo escrito en el autocompletado de Nominatim
@@ -226,6 +221,8 @@ export async function initRegisterForm() {
           coordinates: [selectedLocation.geometry.location.lng(), selectedLocation.geometry.location.lat()],
         };
       }
+      console.log("test");
+
 
 
       //send the data to the server

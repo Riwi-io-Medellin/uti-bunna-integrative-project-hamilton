@@ -53,6 +53,7 @@ export function profileSettings(user) {
               type="text"
               value="${user?.full_name}"
               class="bg-transparent text-[13px] text-gray-700 outline-none w-full placeholder-gray-400"
+              disabled
             />
           </div>
         </div>
@@ -68,6 +69,7 @@ export function profileSettings(user) {
               type="email"
               value="${user?.email}"
               class="bg-transparent text-[13px] text-gray-700 outline-none w-full placeholder-gray-400"
+              disabled
             />
           </div>
         </div>

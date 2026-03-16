@@ -59,6 +59,18 @@ export function initGoogleMapRegister(containerId, lat, lng) {
   map.addListener("click", (e) => {
     marker.setPosition(e.latLng);    
     console.log(getMarkerPosition());
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: e.latLng }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const inputLocation = document.getElementById("location");
+        if (inputLocation) {
+          inputLocation.value = results[0].formatted_address;
+        }
+      } else {
+        console.error("Geocoder failed due to: " + status);
+      }
+    });
   });
 
   return map;

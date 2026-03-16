@@ -8,8 +8,8 @@ export function PassengersNearby() {
      <div class="p-10 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Passengers Nearby</h2>
-                    <p class="text-sm text-gray-400">Available on your current route</p>
+                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Pasajeros cercanos</h2>
+                    <p class="text-sm text-gray-400">Disponible en su ruta actual</p>
                 </div>
             </div>
 
@@ -25,7 +25,7 @@ export async function initPassengersNearbyView() {
     initGoogleMap("map", 6.219186319336883, -75.5836256336475);
     const matches = await getMatches();
     const totalPassengers = document.getElementById("total-passengers");
-    totalPassengers.innerHTML = matches.total + " Passengers Nearby";
+    totalPassengers.innerHTML = matches.total + " Pasajeros cercanos";
 
     drawMultipleMarkers(matches)
     drawRouteGeoJSON(JSON.parse(matches.driverRoute))

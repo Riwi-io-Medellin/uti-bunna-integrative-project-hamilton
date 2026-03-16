@@ -15,8 +15,8 @@ export async function MatchesView() {
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Passengers Nearby</h2>
-                    <p class="text-sm text-gray-400">Available on your current route</p>
+                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Pasajeros cercanos</h2>
+                    <p class="text-sm text-gray-400">Disponible en su ruta actual</p>
                 </div>
             </div>
 
@@ -37,7 +37,7 @@ export async function initMatchesView() {
     const data = await getMatches();
     const matchesList = document.getElementById("matches-list");
     const totalPassengers = document.getElementById("total-passengers");
-    totalPassengers.innerHTML = data.total + " Passengers Nearby";
+    totalPassengers.innerHTML = data.total + " Pasajeros cercanos";
     matchesList.innerHTML = ListMatches(data.matches);
 }
 
