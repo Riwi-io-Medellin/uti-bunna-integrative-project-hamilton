@@ -26,7 +26,6 @@ export async function MatchesView() {
         </div>
 
 <div id="matches-list" class="hidden px-6 space-y-4 pb-24">
-            ${SkeletonListMatches()}
         </div>
 
         ${NavBar()}
@@ -35,6 +34,7 @@ export async function MatchesView() {
 </div>
     `
 }
+let data = null
 
 export async function initMatchesView() {
     const totalPassengers = document.getElementById("total-passengers");
@@ -48,15 +48,16 @@ export async function initMatchesView() {
         try {
             findBtn.disabled = true;
             findBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i> Buscando...';
-
-            const data = await getMatches();
-
+            
+            matchesList.classList.remove("hidden");
+            matchesList.innerHTML = SkeletonListMatches()
+            findBtn.remove();
+            
+            data = await getMatches();
             totalPassengers.innerHTML = `${data.total} Pasajeros cercanos`;
 
-            matchesList.classList.remove("hidden");
             matchesList.innerHTML = ListMatches(data.matches);
 
-            findBtn.remove();
         } catch (error) {
             console.error("Error loading matches:", error);
             Toastify({
@@ -74,8 +75,14 @@ export async function initMatchesView() {
             findBtn.innerHTML = '<i class="fas fa-search text-sm"></i>Encontrar pasajeros cerca a mi ruta';
         }
     };
+    if (!data) {
+        findBtn.addEventListener("click", loadMatches);
+    } else {
+        matchesList.classList.remove("hidden");
+        matchesList.innerHTML = ListMatches(data.matches);
+        findBtn.remove();
+    }
 
-    findBtn.addEventListener("click", loadMatches);
 }
 
 //current route
