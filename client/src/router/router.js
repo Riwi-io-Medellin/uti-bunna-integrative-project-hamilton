@@ -18,7 +18,7 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["myroute", "matches", "profileSettings","contact-attemps"];
+  const privateRoutes = ["myroute", "matches", "profileSettings", "contact-attemps"];
 
   // get user and role
   const user = getUser();
@@ -61,7 +61,7 @@ export async function router() {
       view: () => profileSettings(getUser()),
       init: initProfileSettings,
     },
-    "contact-attemps": {view: ContactAttemps, init: initContactAttempsView}
+    "contact-attemps": { view: ContactAttemps, init: initContactAttempsView }
   };
 
   const routeConfig = routes[route];

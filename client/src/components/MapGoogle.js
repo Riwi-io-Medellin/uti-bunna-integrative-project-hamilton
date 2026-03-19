@@ -203,23 +203,12 @@ export function drawRouteGeoJSON(geojson) {
 }
 
 export function initLandingMap(containerId) {
-  const MEDELLIN_BOUNDS = {
-    north: 6.35,
-    south: 6.15,
-    west: -75.7,
-    east: -75.45,
-  };
-
   map = new google.maps.Map(document.getElementById(containerId), {
     center: { lat: 6.2442, lng: -75.5812 },
     zoom: 12,
-    minZoom: 11, // prevent zooming out too much
-    restriction: {
-      latLngBounds: MEDELLIN_BOUNDS,
-      strictBounds: false,
-    },
     disableDefaultUI: true,
-    zoomControl: true, // allow users to zoom
+    gestureHandling: "none",
+    keyboardShortcuts: false,
   });
 
   return map;
