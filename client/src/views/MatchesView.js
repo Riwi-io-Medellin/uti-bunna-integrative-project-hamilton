@@ -15,14 +15,17 @@ export async function MatchesView() {
         <div class="p-6 -mt-4 bg-white rounded-t-3xl z-10">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">0 Pasajeros cercanos</h2>
-                    <p class="text-sm text-gray-400">Disponible en su ruta actual</p>
+                    <h2 id="total-passengers" class="text-2xl font-bold text-gray-800">Encuentra pasajeros cerca de tu ruta</h2>
+                    <button id="find-matches-btn" class="mt-6 w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fas fa-search text-sm"></i>
+                        Buscar
+                    </button>
                 </div>
             </div>
 
         </div>
 
-        <div id="matches-list" class="px-6 space-y-4 pb-24">
+<div id="matches-list" class="hidden px-6 space-y-4 pb-24">
             ${SkeletonListMatches()}
         </div>
 
@@ -34,11 +37,45 @@ export async function MatchesView() {
 }
 
 export async function initMatchesView() {
-    const data = await getMatches();
-    const matchesList = document.getElementById("matches-list");
     const totalPassengers = document.getElementById("total-passengers");
-    totalPassengers.innerHTML = data.total + " Pasajeros cercanos";
-    matchesList.innerHTML = ListMatches(data.matches);
+    const matchesList = document.getElementById("matches-list");
+    const findBtn = document.getElementById("find-matches-btn");
+
+    totalPassengers.innerHTML = "Encuentra pasajeros cerca de tu ruta";
+    matchesList.classList.add("hidden");
+
+    const loadMatches = async () => {
+        try {
+            findBtn.disabled = true;
+            findBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i> Buscando...';
+
+            const data = await getMatches();
+
+            totalPassengers.innerHTML = `${data.total} Pasajeros cercanos`;
+
+            matchesList.classList.remove("hidden");
+            matchesList.innerHTML = ListMatches(data.matches);
+
+            findBtn.remove();
+        } catch (error) {
+            console.error("Error loading matches:", error);
+            Toastify({
+                text: "Error al cargar pasajeros cercanos. Intenta de nuevo.",
+                className: "info",
+                style: {
+                    background: "linear-gradient(to right, #ef4444, #dc2626)",
+                },
+                duration: 4000,
+                gravity: "top",
+                position: "right",
+            }).showToast();
+
+            findBtn.disabled = false;
+            findBtn.innerHTML = '<i class="fas fa-search text-sm"></i>Encontrar pasajeros cerca a mi ruta';
+        }
+    };
+
+    findBtn.addEventListener("click", loadMatches);
 }
 
 //current route

@@ -6,7 +6,7 @@ Uti Bunna is a community-based route matching platform designed for the Riwi eco
 
 The platform allows drivers to visualize their route and discover passengers located near it using geospatial technology. Instead of acting as a ride-sharing service, Uti Bunna simply facilitates the **initial contact between people who already share a similar path**.
 
-> **Live backend:** `https://uti-bunna-integrative-project-hamilton.onrender.com`
+> **Live:** `https://uti-bunna-integrative-project-hamilton-qrqj.onrender.com/#/landingPage`
 
 ---
 
