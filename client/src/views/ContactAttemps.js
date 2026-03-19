@@ -3,6 +3,8 @@ import { SkeletonListMatches } from "../components/Driver/SkeletonListMatches.js
 import { Header } from "../components/Header.js";
 
 export async function ContactAttemps(params) {
+    const hash = window.location.hash || "#/";
+
     return `
 <div class="bg-gray-100 flex justify-center  min-h-screen">
 
@@ -47,11 +49,11 @@ export async function ContactAttemps(params) {
         </section>
 
         <nav class="border-t border-gray-100 flex justify-around py-4 bg-white">
-            <a href="#/" class="flex flex-col items-center gap-1 text-indigo-600">
+            <a href="#/" class="flex flex-col items-center gap-1 ${hash === '#/' || hash.startsWith('#/contact-attemps') ? 'text-indigo-600' : 'text-gray-400'}">
                 <i class="fa-solid fa-house text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
             </a>
-            <a href="#/profileSettings" class="flex flex-col items-center gap-1 text-gray-400">
+            <a href="#/profileSettings" class="flex flex-col items-center gap-1 ${hash.startsWith('#/profileSettings') ? 'text-indigo-600' : 'text-gray-400'}">
                 <i class="fa-regular fa-user text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-widest">PERFIL</span>
             </a>

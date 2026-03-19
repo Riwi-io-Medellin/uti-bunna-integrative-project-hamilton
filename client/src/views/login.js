@@ -56,11 +56,14 @@ export function LoginView() {
         </div>
 
         <button type="button" id="signInBtn"
-          class="w-full py-[13px] bg-[#5B5BD6] hover:bg-[#4747c2] text-white text-[15px] font-semibold rounded-xl flex items-center justify-center gap-2 tracking-tight transition-all duration-150 shadow-[0_4px_14px_rgba(91,91,214,.35)] hover:shadow-[0_6px_20px_rgba(91,91,214,.45)] hover:-translate-y-px active:translate-y-0 cursor-pointer">
-          Iniciar sesión
-          <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
-          </svg>
+          class="w-full h-[50px] bg-[#5B5BD6] hover:bg-[#4747c2] text-white text-[15px] font-semibold rounded-xl flex items-center justify-center tracking-tight transition-all duration-150 shadow-[0_4px_14px_rgba(91,91,214,.35)] hover:shadow-[0_6px_20px_rgba(91,91,214,.45)] hover:-translate-y-px active:translate-y-0 cursor-pointer">
+          <span class="flex items-center gap-2">
+            Iniciar sesión
+            <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+          </span>
+          <div class="hidden animate-spin rounded-full h-6 w-6 border-4 border-b-current border-gray-200"></div>
         </button>
 
         <div class="grid grid-cols-2 gap-3 mb-7"></div>
@@ -86,6 +89,7 @@ export function initLoginView() {
   document.getElementById("signInBtn")?.addEventListener("click", async () => {
     const email = document.querySelector('input[type="email"]').value;
     const password = document.getElementById("passInput").value;
+    const btnSignIn = document.getElementById("signInBtn");
 
     if (!email || !password) {
       alert("Por favor completa ambos campos");
@@ -93,6 +97,10 @@ export function initLoginView() {
     }
 
     try {
+      btnSignIn.disabled = true;
+      btnSignIn.querySelector("div").classList.remove("hidden");
+      btnSignIn.querySelector("span").classList.add("hidden");
+
       const res = await fetch(
         "https://uti-bunna-integrative-project-hamilton.onrender.com/api/auth/login",
         {
@@ -120,7 +128,7 @@ export function initLoginView() {
 
       } else {
         Toastify({
-          text: json.message,
+          text: json.message || json.errors[0].message || "Error al iniciar sesión",
           duration: 3000,
           gravity: "top",
           position: "right",
@@ -140,6 +148,10 @@ export function initLoginView() {
           background: "red",
         },
       }).showToast();
+    } finally {
+      btnSignIn.disabled = false;
+      btnSignIn.querySelector("div").classList.add("hidden");
+      btnSignIn.querySelector("span").classList.remove("hidden");
     }
   });
 

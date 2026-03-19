@@ -1,3 +1,6 @@
+import { loadGoogleMaps } from "../utils/googleMapsLoader.js";
+import { initLandingMap } from "../components/MapGoogle.js";
+
 export function landingPage() {
   return `
   <!-- NAVBAR -->
@@ -36,10 +39,7 @@ export function landingPage() {
       </div>
         <div class="relative bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl h-80 md:h-96 flex items-center justify-center shadow-2xl overflow-hidden">
         
-        <iframe
-            class="absolute inset-0 w-full h-full border-0"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-75.65%2C6.15%2C-75.50%2C6.35&layer=mapnik">
-        </iframe>
+        <div id="landing-map" class="absolute inset-0 w-full h-full border-0"></div>
 
         <div class="absolute top-4 right-4 z-10 text-center bg-white/70 backdrop-blur-sm px-4 py-2 rounded-xl">
         <p class="text-indigo-700 font-semibold text-sm">Medellín</p>
@@ -126,6 +126,12 @@ export function landingPage() {
         <span class="text-gray-300">🌐 Español</span>
       </div>
     </div>
+    </div>
   </footer>
   `;
+}
+
+export async function initLandingPage() {
+  await loadGoogleMaps();
+  initLandingMap("landing-map");
 }

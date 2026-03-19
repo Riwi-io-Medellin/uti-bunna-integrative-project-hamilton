@@ -129,7 +129,7 @@ export function RegisterForm() {
         <div class="px-6 py-8">
             <button type="submit" class="flex justify-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] mb-4">
                 <span>Crear cuenta</span>
-                <div class="hidden animate-spin rounded-full h-10 w-10 border-4 border-b-current border-gray-200"></div>
+                <div class="hidden animate-spin rounded-full h-6 w-6 border-4 border-b-current border-gray-200"></div>
             </button>
 
             <p class="text-[10px] text-center text-gray-400 leading-tight">

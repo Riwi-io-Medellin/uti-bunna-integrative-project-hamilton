@@ -1,5 +1,5 @@
 import { render } from "../core/render.js";
-import { landingPage } from "../views/landingPages.js";
+import { landingPage, initLandingPage } from "../views/landingPages.js";
 import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
 import { isLoggedIn, getUser } from "../utils/utils.js";
@@ -52,7 +52,7 @@ export async function router() {
   }
 
   const routes = {
-    landingPage: { view: landingPage },
+    landingPage: { view: landingPage, init: initLandingPage },
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     matches: { view: MatchesView, init: initMatchesView },
