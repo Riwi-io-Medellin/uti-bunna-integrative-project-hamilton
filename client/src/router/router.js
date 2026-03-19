@@ -1,5 +1,5 @@
 import { render } from "../core/render.js";
-import { landingPage } from "../views/landingPages.js";
+import { landingPage, initLandingPage } from "../views/landingPages.js";
 import { RegisterForm, initRegisterForm } from "../views/RegisterForm.js";
 import { LoginView, initLoginView } from "../views/login.js";
 import { isLoggedIn, getUser } from "../utils/utils.js";
@@ -18,7 +18,7 @@ export async function router() {
   const [, route] = hash.split("/");
 
   const publicRoutes = ["login", "register", "landingPage"];
-  const privateRoutes = ["myroute", "matches", "profileSettings","contact-attemps"];
+  const privateRoutes = ["myroute", "matches", "profileSettings", "contact-attemps"];
 
   // get user and role
   const user = getUser();
@@ -52,7 +52,7 @@ export async function router() {
   }
 
   const routes = {
-    landingPage: { view: landingPage },
+    landingPage: { view: landingPage, init: initLandingPage },
     login: { view: LoginView, init: initLoginView },
     register: { view: RegisterForm, init: initRegisterForm },
     matches: { view: MatchesView, init: initMatchesView },
@@ -61,7 +61,7 @@ export async function router() {
       view: () => profileSettings(getUser()),
       init: initProfileSettings,
     },
-    "contact-attemps": {view: ContactAttemps, init: initContactAttempsView}
+    "contact-attemps": { view: ContactAttemps, init: initContactAttempsView }
   };
 
   const routeConfig = routes[route];

@@ -1,4 +1,5 @@
 import markerRiwiIcon from "../assets/marker_riwi.ico";
+import markerCoder from "../assets/marker-coder.png";
 export function MapGoogle() {
   return `
     <div id="map" style="height: 500px; width: 100%;"></div>
@@ -51,13 +52,13 @@ export function initGoogleMapRegister(containerId, lat, lng) {
     }
   });
   marker = new google.maps.Marker({
-    position : null,
+    position: null,
     map,
   });
 
- //set marker position when click
+  //set marker position when click
   map.addListener("click", (e) => {
-    marker.setPosition(e.latLng);    
+    marker.setPosition(e.latLng);
     console.log(getMarkerPosition());
 
     const geocoder = new google.maps.Geocoder();
@@ -128,9 +129,11 @@ export function drawMultipleMarkers(locations) {
 
     const marker = new google.maps.Marker({
       position,
-      map: map,
-      title: location.title || "Ubicación",
-      icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+      map,
+      icon: {
+        url: markerCoder,
+        scaledSize: new google.maps.Size(25, 30) // tamaño del icono
+      }
     });
 
     //add marker to bounds
@@ -163,7 +166,7 @@ export function drawMultipleMarkers(locations) {
       infoWindow.open(map, marker);
     });
 
-  
+
     markersList.push(marker);
   });
 
@@ -197,4 +200,16 @@ export function drawRouteGeoJSON(geojson) {
     strokeWeight: 4
   });
 
+}
+
+export function initLandingMap(containerId) {
+  map = new google.maps.Map(document.getElementById(containerId), {
+    center: { lat: 6.2442, lng: -75.5812 },
+    zoom: 12,
+    disableDefaultUI: true,
+    gestureHandling: "none",
+    keyboardShortcuts: false,
+  });
+
+  return map;
 }
